@@ -4,7 +4,5 @@ Requirements:
 * connect 0.3.0
 * apac@latest
 * underscore
-
-Included:
-
-* redis-client 0.3.5 from leepa on github
+* ejs
+* node_redis

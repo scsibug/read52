@@ -2,8 +2,8 @@ var app = require('express').createServer();
 var sys = require('sys');
 var books = require("./books");
 var users = require("./users");
-
-var client = require("./lib/redis-client").createClient();
+var redis = require("redis"),
+    client = redis.createClient();
 
 app.listen(8124);
 
@@ -29,3 +29,8 @@ app.get('/books', function(req, res){
               function() {res.send(booklist)}
              );
 });
+
+// Get book information from amazon
+//app.get('/books/:id', function(req, res) {
+//    
+//});
