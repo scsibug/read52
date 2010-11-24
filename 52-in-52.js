@@ -2,6 +2,7 @@ var app = require('express').createServer();
 var sys = require('sys');
 
 var client = require("./lib/redis-client").createClient();
+var books = require("./books");
 
 app.listen(8124);
 
@@ -14,6 +15,14 @@ app.get('/users', function(req, res){
     listUsers(client,
               function(name) {userlist+=String(name+"<br />")},
               function() {res.send(userlist)}
+             );
+});
+
+app.get('/books', function(req, res){
+    var booklist = "<h1>Book List</h1><br />"
+    books.listBooks(client,
+              function(title) {booklist+=String(title+"<br />")},
+              function() {res.send(booklist)}
              );
 });
 
