@@ -1,6 +1,7 @@
 // Module to manage books
 // Stores all the metadata we get from Amazon's Product API.
 var sys = require('sys');
+require('underscore');
 var book_lookup = require('./book_lookup');
 // Creating books is done by:
 //  * Checking if the ISBN already exists in our database (if so, we're already done)
@@ -44,37 +45,37 @@ exports.save_book = function(client, ean) {
         } else {
             sys.print(sys.inspect(result));
             // fire and forget a bunch of updates
-            if(isDef(result.ItemAttributes.EAN)) {
+            if(!! _.isUndefined(result.ItemAttributes.EAN)) {
                 client.set("book:"+ean+":ean", result.ItemAttributes.EAN);
             }
-            if(isDef(result.ItemAttributes.Title)) {
+            if(!! _.isUndefined(result.ItemAttributes.Title)) {
                 client.set("book:"+ean+":title", result.ItemAttributes.Title);
             }
-            if(isDef(result.ItemAttributes.NumberOfPages)) {
+            if(!! _.isUndefined(result.ItemAttributes.NumberOfPages)) {
                 client.set("book:"+ean+":pages", result.ItemAttributes.NumberOfPages);
             }
-            if(isDef(result.ASIN)) {
+            if(!! _.isUndefined(result.ASIN)) {
                 client.set("book:"+ean+":asin", result.ASIN);
             }
-            if(isDef(result.ItemAttributes.ISBN)) {
+            if(!! _.isUndefined(result.ItemAttributes.ISBN)) {
                 client.set("book:"+ean+":isbn", result.ItemAttributes.ISBN);
             }
-            if(isDef(result.DetailPageURL)) {
+            if(!! _.isUndefined(result.DetailPageURL)) {
                 client.set("book:"+ean+":amz_detail_url", result.DetailPageURL);
             }
-            if(isDef(result.SmallImage)) {
+            if(!! _.isUndefined(result.SmallImage)) {
                 client.set("book:"+ean+":amz_img_small", result.SmallImage);
             }
-            if(isDef(result.MediumImage)) {
+            if(!! _.isUndefined(result.MediumImage)) {
                 client.set("book:"+ean+":amz_img_med", result.MediumImage);
             }
-            if(isDef(result.LargeImage)) {
+            if(!! _.isUndefined(result.LargeImage)) {
                 client.set("book:"+ean+":amz_img_large", result.LargeImage);
             }
-            if(isDef(result)) {
+            if(!! _.isUndefined(result)) {
             client.set("book:"+ean+":amz", result);
             }
-            if(isDef(result.ItemAttributes.Author)) {
+            if(!! _.isUndefined(result.ItemAttributes.Author)) {
                 client.set("book:"+ean+":author", result.ItemAttributes.Author);
             }
         }
@@ -93,5 +94,3 @@ exports.listBooks = function(client, userCallback, endCallback) {
         }
     });
 }
-
-var isDef = function(x) {if (typeof x != "undefined" && x !== null) {return true;};}

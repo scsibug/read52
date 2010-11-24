@@ -1,5 +1,6 @@
 var sys = require('sys'),
 OperationHelper = require('apac').OperationHelper;
+require('underscore');
 var aws_credentials = require('./aws_cred');
 
 opHelper = new OperationHelper({
@@ -29,7 +30,7 @@ exports.isbn_lookup = function(isbn, callback) {
     }, function(error, results) {
         if (error) { sys.print('Error: ' + error + "\n") }
         //sys.print("Results:\n" + sys.inspect(results) + "\n");
-        if (!! isUndefined(results.Items.Item)) {
+        if (!! _.isUndefined(results.Items.Item)) {
         } else if (results.Items.Item.constructor == Array) {
             sys.print("Item is array!");
             // We need to figure out which one of these items we should display...
@@ -41,7 +42,3 @@ exports.isbn_lookup = function(isbn, callback) {
         }
     });
 }
-
-var isUndefined = function(obj) {
-    return typeof obj == 'undefined';
-};
