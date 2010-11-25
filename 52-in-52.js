@@ -7,6 +7,8 @@ var redis = require("redis"),
 
 app.listen(8124);
 
+app.set('view engine', 'ejs');
+
 app.get('/', function(req, res){
     res.send('hello world');
 });
@@ -31,6 +33,9 @@ app.get('/books', function(req, res){
 });
 
 // Get book information from amazon
-//app.get('/books/:id', function(req, res) {
-//    
-//});
+app.get('/books/:id', function(req, res) {
+    var book = { title: "Test Book", isbn: "9781234567890" };
+    res.render('book', {
+        locals: { title: req.params.id, book: book }
+    });
+});
