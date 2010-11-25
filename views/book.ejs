@@ -1,1 +1,13 @@
-Books template!
+<h1>Book information for <%= book.ean %></h1>
+<div>
+<img src="<%= book.amz_img_large %>">
+</div>
+<dl>
+<dt>Title</dt><dd><%= book.title %></dd>
+<dt>ASIN</dt><dd><%= book.asin %></dd>
+<dt>ISBN</dt><dd><%= book.isbn %></dd>
+<dt>EAN/ISBN-13</dt><dd><%= book.ean %></dd>
+<dt>Author</dt><dd><%= book.author %></dd>
+<dt>Pages</dt><dd><%= book.pages %></dd>
+<dt>Details</dt><dd><a href="<%= book.amz_detail_url %>">Amazon Page</a></dd>
+</dl>

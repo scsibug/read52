@@ -37,7 +37,8 @@ exports.isbn_lookup = function(isbn, callback) {
             // for now we just take the firest
             callback(error, results.Items.Item.shift());
         } else {
-            sys.print("Item is not array");
+            sys.print("Item is not array\n");
+            sys.print(sys.inspect(results.Items.Item));
             callback(error, results.Items.Item);
         }
     });

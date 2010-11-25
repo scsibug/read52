@@ -25,6 +25,7 @@ app.get('/users', function(req, res){
 
 // List All Books
 app.get('/books', function(req, res){
+    sys.print("SHOULD NOT BE CALLED\n");
     var booklist = "<h1>Book List</h1><br />"
     books.listBooks(client,
               function(title) {booklist+=String(title+"<br />")},
@@ -34,8 +35,20 @@ app.get('/books', function(req, res){
 
 // Get book information from amazon
 app.get('/books/:id', function(req, res) {
-    var book = { title: "Test Book", isbn: "9781234567890" };
-    res.render('book', {
-        locals: { title: req.params.id, book: book }
+    sys.print("received call to /books/{id}\n");
+//    sys.print(sys.inspect(req));
+    books.get_book(client, req.params.id, function (book) {
+        res.render('book', {
+            locals: { title: book.title, book: book }
+        });
     });
+//    sys.print(sys.inspect(res));
 });
+
+// Force an update of book metadata... mostly useful for debugging
+app.post('/books/:id/update', function(req, res) {
+    sys.print("updating "+req.params.id+"\n");
+    books.save_book(client, req.params.id);
+    res.redirect('/books/'+req.params.id, 200);
+});
+
