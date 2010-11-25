@@ -1,14 +1,16 @@
-var app = require('express').createServer();
+var express = require('express');
 var sys = require('sys');
 var books = require("./books");
 var users = require("./users");
 var redis = require("redis"),
     client = redis.createClient();
 
-app.listen(8124);
+var app = express.createServer();
 
+// EJS is our default templating system
 app.set('view engine', 'ejs');
 
+// Front page
 app.get('/', function(req, res){
     res.send('hello world');
 });
@@ -48,3 +50,7 @@ app.post('/books/:id/update', function(req, res) {
     res.redirect('/books/'+req.params.id, 200);
 });
 
+// Static files.  Keep this last so it doesn't interfere with dynamic routes.
+app.use(express.staticProvider(__dirname + '/static'));
+// Start the server
+app.listen(8124);
