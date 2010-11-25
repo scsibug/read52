@@ -34,7 +34,7 @@ exports.get_book = function(client, ean, callback) {
             sys.print('Error: ' + err + "\n");
         } else if (result==null) {
             // book is not in database
-            sys.print("Saving book for the first time\n");
+            sys.print("Saving a book for the first time...");
             exports.save_book(client,ean_clean,callback);
         } else {
             // book exists, just need to query for it
@@ -44,7 +44,6 @@ exports.get_book = function(client, ean, callback) {
 }
 
 var query_book = function(client,ean,callback) {
-    sys.print("Running query_book\n");
     var count = 0;
     var book = new Array();
 
@@ -64,7 +63,6 @@ var query_book = function(client,ean,callback) {
     for (var i = 0; i < book_props.length; i++) {
         var prop = book_props[i];
         var key = "book:"+ean+":"+prop;
-        sys.print("running GET for "+key+"\n");
         get_property(client,key,prop);
     }
 

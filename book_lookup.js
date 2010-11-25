@@ -32,12 +32,11 @@ exports.isbn_lookup = function(isbn, callback) {
         //sys.print("Results:\n" + sys.inspect(results) + "\n");
         if (!! _.isUndefined(results.Items.Item)) {
         } else if (results.Items.Item.constructor == Array) {
-            sys.print("Item is array!");
+            sys.print("This query returned multiple books, we'll just blindly take the first for now.");
             // We need to figure out which one of these items we should display...
             // for now we just take the firest
             callback(error, results.Items.Item.shift());
         } else {
-            sys.print("Item is not array\n");
             sys.print(sys.inspect(results.Items.Item));
             callback(error, results.Items.Item);
         }
