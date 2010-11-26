@@ -6,3 +6,4 @@ Requirements:
 * underscore
 * ejs
 * node_redis
+* vows (testing)
