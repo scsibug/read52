@@ -1,8 +1,17 @@
-<html>
-<head>
-<title>Info for <%= title %></title>
-</head>
-<body>
-<%- body %>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Info for <%= title %></title>
+    <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" />
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" />
+  <!--[if lt IE 8]>
+      <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection" />
+      <![endif]-->
+  <link rel="stylesheet" href="/css/52-in-52.css" type="text/css" media="screen, projection">
+<!-- JQuery and plugins -->
+  <script src="js/jquery-1.4.2.min.js"></script>
+  </head>
+  <body>
+    <%- body %>
+  </body>
 </html>
