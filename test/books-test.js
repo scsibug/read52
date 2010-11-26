@@ -11,22 +11,25 @@ client.flushdb();
 vows.describe('Books').addBatch({
     'Create Book': {
         topic: function() {
-            new books.Book("9780060733353",this.callback);
+            var context = this;
+            var b = new books.Book("9780060733353",function(err,res) {
+                context.callback(err,b);
+            });
         },
         'has ASIN': function(err,book) {
-            assert.equal(book.ASIN, "0060733357");
+            assert.equal(book.asin, "0060733357");
         },
         'has Title': function(err, book) {
-            assert.equal(book.ItemAttributes.Title, "The Confusion (The Baroque Cycle, Vol. 2)");
+            assert.equal(book.title, "The Confusion (The Baroque Cycle, Vol. 2)");
         },
         'has ISBN': function(err, book) {
-            assert.equal(book.ItemAttributes.ISBN, "0060733357");
+            assert.equal(book.isbn, "0060733357");
         },
         'has Author': function(err, book) {
-            assert.equal(book.ItemAttributes.Author, "Neal Stephenson");
+            assert.equal(book.author, "Neal Stephenson");
         },
         'has NumberOfPages': function(err, book) {
-            assert.equal(book.ItemAttributes.NumberOfPages, "848");
+            assert.equal(book.number_of_pages, "848");
         }
     }
 }).addBatch({

@@ -10,7 +10,15 @@ var bookzset = "book_zset";
 
 exports.Book = function (ean,callback) {
     // need to check for valid EAN, or convert from ISBN-10
-    exports.get_book(ean,callback);
+    var context = this;
+    exports.get_book(ean,function(err,result) {
+        context.title = result.ItemAttributes.Title;
+        context.asin = result.ASIN;
+        context.author = result.ItemAttributes.Author;
+        context.isbn = result.ItemAttributes.ISBN;
+        context.number_of_pages = result.ItemAttributes.NumberOfPages;
+        callback(err,context);
+    });
 }
 
 // Take a redis client handle, and EAN/ISBN-13 and return book
