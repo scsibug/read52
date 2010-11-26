@@ -11,7 +11,7 @@ client.flushdb();
 vows.describe('Books').addBatch({
     'Create Book': {
         topic: function() {
-            books.save_book("9780060733353",this.callback);
+            new books.Book("9780060733353",this.callback);
         },
         'has ASIN': function(err,book) {
             assert.equal(book.ASIN, "0060733357");
@@ -30,11 +30,11 @@ vows.describe('Books').addBatch({
         }
     }
 }).addBatch({
-    'Retrieve Book': {
+    'Retrieve Book w/o AWS': {
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                books.save_book("9780060733353",function() {
+                new books.Book("9780060733353",function() {
                     books.query_book("9780060733353",context.callback);
                 });
             });
@@ -61,8 +61,8 @@ vows.describe('Books').addBatch({
             var context = this;
             // flush db, add two books, and get a full list.
             client.flushdb(function() {
-                books.save_book("9780060733353",function() {
-                    books.save_book("9780471292524",function() {
+                new books.Book("9780060733353",function() {
+                    new books.Book("9780471292524",function() {
                         books.list_books(0,99,context.callback);
                     });
                 });

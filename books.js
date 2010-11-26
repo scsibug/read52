@@ -7,6 +7,12 @@ var book_lookup = require('./book_lookup');
 
 var key_from_ean = function(ean) {return ("book:"+ean+":amz");}
 var bookzset = "book_zset";
+
+exports.Book = function (ean,callback) {
+    // need to check for valid EAN, or convert from ISBN-10
+    exports.get_book(ean,callback);
+}
+
 // Take a redis client handle, and EAN/ISBN-13 and return book
 // structure, querying Amazon and saving into Redis if necessary.
 exports.get_book = function(ean, callback) {
@@ -18,10 +24,10 @@ exports.get_book = function(ean, callback) {
             sys.print('Error: ' + err + "\n");
         } else if (result==null) {
             // book is not in database, need to query AWS and save
-            exports.save_book(client,ean_clean,callback);
+            exports.save_book(ean_clean,callback);
         } else {
             // book exists, just need to query for it
-            exports.query_book(client,ean_clean,callback);
+            exports.query_book(ean_clean,callback);
         }
     });
 }
