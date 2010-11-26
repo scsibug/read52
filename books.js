@@ -13,8 +13,7 @@ exports.get_book = function(client, ean, callback) {
         if (err) {
             sys.print('Error: ' + err + "\n");
         } else if (result==null) {
-            // book is not in database
-            sys.print("Saving a book for the first time...");
+            // book is not in database, need to query AWS and save
             exports.save_book(client,ean_clean,callback);
         } else {
             // book exists, just need to query for it
@@ -28,21 +27,22 @@ var key_from_ean = function(ean) {"book:"+ean+":amz"}
 // Query Redis for a book, but do not invoke AWS.
 exports.query_book = function(client,ean,callback) {
     client.get(key_from_ean(ean), function(err,result) {
-        if (err) {callback(err,null)} else {callback(err,JSON.parse(result))}
+        if (err) {
+            callback(err,null)
+        } else {
+            callback(err,JSON.parse(result))
+        }
     });
 }
 
 // Lookup a book through AWS, save into Redis store, and return book.
 exports.save_book = function(client, ean, callback) {
-    sys.print("Being asked to save book with EAN "+ean+"\n");
     book_lookup.isbn_lookup(ean, function(err, result) {
         if (err) {
             sys.print('Error: ' + err + "\n");
             callback(err,null);
         } else {
-            sys.print("No error and callback called\n");
             if(! _.isUndefined(result)) {
-                
                 client.set(key_from_ean(ean), JSON.stringify(result) ,function(err,set_result){
                     if (err) {
                         sys.print('Error: ' + err + "\n");
