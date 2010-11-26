@@ -2,13 +2,15 @@
 // Stores all the metadata we get from Amazon's Product API.
 var sys = require('sys');
 require('underscore');
+var rclient = require('./redisclient');
 var book_lookup = require('./book_lookup');
 
 var key_from_ean = function(ean) {return ("book:"+ean+":amz");}
 var bookzset = "book_zset";
 // Take a redis client handle, and EAN/ISBN-13 and return book
 // structure, querying Amazon and saving into Redis if necessary.
-exports.get_book = function(client, ean, callback) {
+exports.get_book = function(ean, callback) {
+    var client = rclient.getClient();
     // check if we've saved information about this book before.
     ean_clean = ean.replace(/-/g,"");
     client.get("book:"+ean_clean+":ean", function(err,result) {
@@ -25,7 +27,8 @@ exports.get_book = function(client, ean, callback) {
 }
 
 // Query Redis for a book, but do not invoke AWS.
-exports.query_book = function(client,ean,callback) {
+exports.query_book = function(ean,callback) {
+    var client = rclient.getClient();
     client.get(key_from_ean(ean), function(err,result) {
         if (err) {
             callback(err,null);
@@ -36,7 +39,8 @@ exports.query_book = function(client,ean,callback) {
 }
 
 // Lookup a book through AWS, save into Redis store, and return book.
-exports.save_book = function(client, ean, callback) {
+exports.save_book = function(ean, callback) {
+    var client = rclient.getClient();
     book_lookup.isbn_lookup(ean, function(err, result) {
         if (err) {
             sys.print('Error: ' + err + "\n");
@@ -59,11 +63,13 @@ exports.save_book = function(client, ean, callback) {
     });
 }
 
-exports.count_books = function(client, callback) {
+exports.count_books = function(callback) {
+    var client = rclient.getClient();
     client.zcard(bookzset,callback);
 }
 
-exports.list_books = function(client, start, end, callback) {
+exports.list_books = function(start, end, callback) {
+    var client = rclient.getClient();
     client.zrange(bookzset,start,end, function(err,reply){
         var replies = 0;
         var books = new Array();

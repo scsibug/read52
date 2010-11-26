@@ -34,7 +34,7 @@ isbn_lookup_unthrottled = function(isbn, callback) {
         } else if (results.Items.Item.constructor == Array) {
             sys.print("This query returned multiple books, we'll just blindly take the first for now.");
             // We need to figure out which one of these items we should display...
-            // for now we just take the firest
+            // for now we just take the first.
             callback(error, results.Items.Item.shift());
         } else {
             //sys.print(sys.inspect(results.Items.Item));

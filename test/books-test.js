@@ -1,19 +1,17 @@
 var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
-var books = require('../books');
-var redis = require("redis"),
-    client = redis.createClient();
-
-client.select(99,function(err,result) {
-    // Clear out this test database
-    client.flushdb();
-});
+var rclient = require('../redisclient');
+var books = require('../books'); // <--- this is setting itself up before the client init!!!
+sys.print("initing client from test\n");
+var client = rclient.initClient(99);
+rclient.getClient();
+client.flushdb();
 
 vows.describe('Books').addBatch({
     'Create Book': {
         topic: function() {
-            books.save_book(client,"9780060733353",this.callback);
+            books.save_book("9780060733353",this.callback);
         },
         'has ASIN': function(err,book) {
             assert.equal(book.ASIN, "0060733357");
@@ -36,8 +34,8 @@ vows.describe('Books').addBatch({
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                books.save_book(client,"9780060733353",function() {
-                    books.query_book(client,"9780060733353",context.callback);
+                books.save_book("9780060733353",function() {
+                    books.query_book("9780060733353",context.callback);
                 });
             });
         },
@@ -63,9 +61,9 @@ vows.describe('Books').addBatch({
             var context = this;
             // flush db, add two books, and get a full list.
             client.flushdb(function() {
-                books.save_book(client,"9780060733353",function() {
-                    books.save_book(client,"9780471292524",function() {
-                        books.list_books(client,0,99,context.callback);
+                books.save_book("9780060733353",function() {
+                    books.save_book("9780471292524",function() {
+                        books.list_books(0,99,context.callback);
                     });
                 });
             });
@@ -77,6 +75,6 @@ vows.describe('Books').addBatch({
             assert.equal(booklist[0].ItemAttributes.Title, "The Confusion (The Baroque Cycle, Vol. 2)");
             assert.equal(booklist[1].ItemAttributes.Title,"Developing Products in Half the Time: New Rules, New Tools, 2nd Edition");
         },
-        teardown: function() { client.quit();}
+        teardown: function() { rclient.quit();}
     }
 }).export(module);
