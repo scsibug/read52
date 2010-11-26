@@ -2,7 +2,7 @@ var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
 var rclient = require('../redisclient');
-var books = require('../books'); // <--- this is setting itself up before the client init!!!
+var books = require('../books');
 sys.print("initing client from test\n");
 var client = rclient.initClient(99);
 rclient.getClient();
