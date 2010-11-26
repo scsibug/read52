@@ -75,6 +75,6 @@ vows.describe('Books').addBatch({
             assert.equal(booklist[0].ItemAttributes.Title, "The Confusion (The Baroque Cycle, Vol. 2)");
             assert.equal(booklist[1].ItemAttributes.Title,"Developing Products in Half the Time: New Rules, New Tools, 2nd Edition");
         },
-        teardown: function() { rclient.quit();}
+        teardown: function() {rclient.quit();} // do this in last batch, to ensure clean exit.
     }
 }).export(module);
