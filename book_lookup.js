@@ -37,7 +37,7 @@ exports.isbn_lookup = function(isbn, callback) {
             // for now we just take the firest
             callback(error, results.Items.Item.shift());
         } else {
-            sys.print(sys.inspect(results.Items.Item));
+            //sys.print(sys.inspect(results.Items.Item));
             callback(error, results.Items.Item);
         }
     });
