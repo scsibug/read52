@@ -4,6 +4,8 @@ var sys = require('sys');
 require('underscore');
 var book_lookup = require('./book_lookup');
 
+var key_from_ean = function(ean) {return ("book:"+ean+":amz");}
+var bookzset = "book_zset";
 // Take a redis client handle, and EAN/ISBN-13 and return book
 // structure, querying Amazon and saving into Redis if necessary.
 exports.get_book = function(client, ean, callback) {
@@ -22,15 +24,13 @@ exports.get_book = function(client, ean, callback) {
     });
 }
 
-var key_from_ean = function(ean) {"book:"+ean+":amz"}
-
 // Query Redis for a book, but do not invoke AWS.
 exports.query_book = function(client,ean,callback) {
     client.get(key_from_ean(ean), function(err,result) {
         if (err) {
-            callback(err,null)
+            callback(err,null);
         } else {
-            callback(err,JSON.parse(result))
+            callback(err,JSON.parse(result));
         }
     });
 }
@@ -43,11 +43,14 @@ exports.save_book = function(client, ean, callback) {
             callback(err,null);
         } else {
             if(! _.isUndefined(result)) {
-                client.set(key_from_ean(ean), JSON.stringify(result) ,function(err,set_result){
+                var book_key = key_from_ean(ean);
+                client.set(book_key, JSON.stringify(result) ,function(err,set_result){
                     if (err) {
                         sys.print('Error: ' + err + "\n");
                         callback(err,null);
                     } else {
+                        // Add this key to the set of books
+                        client.zadd(bookzset,ean,book_key);
                         callback(null,result);
                     }
                 });
@@ -56,14 +59,24 @@ exports.save_book = function(client, ean, callback) {
     });
 }
 
-exports.listBooks = function(client, userCallback, endCallback) {
-    client.keys("book:*:title", function(err,reply){
+exports.count_books = function(client, callback) {
+    client.zcard(bookzset,callback);
+}
+
+exports.list_books = function(client, start, end, callback) {
+    client.zrange(bookzset,start,end, function(err,reply){
         var replies = 0;
+        var books = new Array();
+        if (err) {
+            sys.print('Error: ' + err + "\n");
+        }
         for(var i=0; i < reply.length; i++) {
-            client.get(reply[i], function(err,title){
-                userCallback(title);
+            client.get(reply[i], function(err,book){
+                books.push(JSON.parse(book));
                 replies++;
-                if (replies == reply.length) {endCallback();}
+                if (replies == reply.length) {
+                    callback(err, books);
+                }
             });
         }
     });

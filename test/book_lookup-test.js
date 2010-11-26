@@ -3,6 +3,7 @@ var sys = require('sys'),
     assert = require('assert');
 var book_lookup = require('../book_lookup');
 
+// Test a known book for common values
 vows.describe('Amazon Book Lookup').addBatch({
     'Lookup Book': {
         topic: function () {

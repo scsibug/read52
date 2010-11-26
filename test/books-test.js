@@ -34,7 +34,12 @@ vows.describe('Books').addBatch({
 }).addBatch({
     'Retrieve Book': {
         topic: function() {
-            books.query_book(client,"9780060733353",this.callback);
+            var context = this;
+            client.flushdb(function() {
+                books.save_book(client,"9780060733353",function() {
+                    books.query_book(client,"9780060733353",context.callback);
+                });
+            });
         },
         'has ASIN': function(book) {
             assert.equal(book.ASIN, "0060733357");            
@@ -50,6 +55,23 @@ vows.describe('Books').addBatch({
         },
         'has NumberOfPages': function(err, book) {
             assert.equal(book.ItemAttributes.NumberOfPages, "848");
+        },
+    }
+}).addBatch({
+    'Book Listing': {
+        topic: function() {
+            var context = this;
+            // flush db, add two books, and get a full list.
+            client.flushdb(function() {
+                books.save_book(client,"9780060733353",function() {
+                    books.save_book(client,"9780471292524",function() {
+                        books.list_books(client,0,99,context.callback);
+                    });
+                });
+            });
+        },
+        'has correct count': function(err, booklist) {
+            assert.equal(booklist.length, 2);
         },
         teardown: function() { client.quit();}
     }

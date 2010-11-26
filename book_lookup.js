@@ -22,7 +22,6 @@ isbn_lookup_unthrottled = function(isbn, callback) {
         sys.print("ISBN length is incorrect, must be 10 or 13 ("+isbn_clean+")\n");
         return;
     }
-    sys.print("executing item lookup now!\n");
     opHelper.execute('ItemLookup', {
         'SearchIndex': 'Books',
         'IdType': idtype,
@@ -55,11 +54,9 @@ exports.isbn_lookup = function() {
     var delta = +new Date() - previous_run;
     previous_run = +new Date();
     if (delta > throttle_time) {
-        sys.print("making call without throttling\n");
         isbn_lookup_unthrottled.apply(context,args);
     } else {
-        sys.print("(AWS throttling "+(throttle_time-delta)/1000+" seconds)\n");
-        
+        sys.print("(throttling AWS for "+(throttle_time-delta)/1000+" seconds)\n");
         setTimeout(function() {
             isbn_lookup_unthrottled.apply(context,args);
         }, throttle_time - delta);
