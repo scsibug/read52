@@ -10,7 +10,7 @@ opHelper = new OperationHelper({
 });
 
 // Lookup a book by ISBN-13, and get product information from AWS
-exports.isbn_lookup = function(isbn, callback) {
+isbn_lookup_unthrottled = function(isbn, callback) {
     // strip out dashes/spaces from ISBN
     isbn_clean = isbn.replace(/-/g,"");
     var idtype = "EAN";
@@ -22,6 +22,7 @@ exports.isbn_lookup = function(isbn, callback) {
         sys.print("ISBN length is incorrect, must be 10 or 13 ("+isbn_clean+")\n");
         return;
     }
+    sys.print("executing item lookup now!\n");
     opHelper.execute('ItemLookup', {
         'SearchIndex': 'Books',
         'IdType': idtype,
@@ -41,4 +42,26 @@ exports.isbn_lookup = function(isbn, callback) {
             callback(error, results.Items.Item);
         }
     });
+}
+
+// Amazon prefers 1 second between calls, or 503 errors become likely.
+var throttle_time = 1100
+var previous_run = 0;
+
+// This runs an ISBN lookup, ensuring that calls are spaced at least
+// 'throttle_time' apart.
+exports.isbn_lookup = function() {
+    var context = this, args = arguments;
+    var delta = +new Date() - previous_run;
+    previous_run = +new Date();
+    if (delta > throttle_time) {
+        sys.print("making call without throttling\n");
+        isbn_lookup_unthrottled.apply(context,args);
+    } else {
+        sys.print("(AWS throttling "+(throttle_time-delta)/1000+" seconds)\n");
+        
+        setTimeout(function() {
+            isbn_lookup_unthrottled.apply(context,args);
+        }, throttle_time - delta);
+    }
 }
