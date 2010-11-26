@@ -5,19 +5,25 @@ require('underscore');
 var rclient = require('./redisclient');
 var book_lookup = require('./book_lookup');
 
-var key_from_ean = function(ean) {return ("book:"+ean+":amz");}
+exports.key_from_ean = function (ean) {
+    return ("book:"+ean+":amz");
+}
+exports.ean_from_key = function (key) {
+    return key.replace(/^book:/,"").replace(/:amz$/,"");
+}
 var bookzset = "book_zset";
 
-exports.Book = function (ean,callback) {
+exports.Book = function Book (ean,callback) {
     // need to check for valid EAN, or convert from ISBN-10
     var context = this;
     exports.get_book(ean,function(err,result) {
-        context.title = result.ItemAttributes.Title;
-        context.asin = result.ASIN;
-        context.author = result.ItemAttributes.Author;
-        context.isbn = result.ItemAttributes.ISBN;
-        context.number_of_pages = result.ItemAttributes.NumberOfPages;
-        callback(err,context);
+            context.title = result.ItemAttributes.Title;
+            context.ean = result.ItemAttributes.EAN;
+            context.asin = result.ASIN;
+            context.author = result.ItemAttributes.Author;
+            context.isbn = result.ItemAttributes.ISBN;
+            context.number_of_pages = result.ItemAttributes.NumberOfPages;
+            callback(err,context);
     });
 }
 
@@ -26,8 +32,8 @@ exports.Book = function (ean,callback) {
 exports.get_book = function(ean, callback) {
     var client = rclient.getClient();
     // check if we've saved information about this book before.
-    ean_clean = ean.replace(/-/g,"");
-    client.get("book:"+ean_clean+":ean", function(err,result) {
+    var ean_clean = ean.replace(/-/g,"");
+    client.get(exports.key_from_ean(ean), function(err,result) {
         if (err) {
             sys.print('Error: ' + err + "\n");
         } else if (result==null) {
@@ -43,7 +49,7 @@ exports.get_book = function(ean, callback) {
 // Query Redis for a book, but do not invoke AWS.
 exports.query_book = function(ean,callback) {
     var client = rclient.getClient();
-    client.get(key_from_ean(ean), function(err,result) {
+    client.get(exports.key_from_ean(ean), function(err,result) {
         if (err) {
             callback(err,null);
         } else {
@@ -61,7 +67,7 @@ exports.save_book = function(ean, callback) {
             callback(err,null);
         } else {
             if(! _.isUndefined(result)) {
-                var book_key = key_from_ean(ean);
+                var book_key = exports.key_from_ean(ean);
                 client.set(book_key, JSON.stringify(result) ,function(err,set_result){
                     if (err) {
                         sys.print('Error: ' + err + "\n");
@@ -92,8 +98,9 @@ exports.list_books = function(start, end, callback) {
             sys.print('Error: ' + err + "\n");
         }
         for(var i=0; i < reply.length; i++) {
-            client.get(reply[i], function(err,book){
-                books.push(JSON.parse(book));
+            var ean = exports.ean_from_key(reply[i].toString());
+            new exports.Book(ean, function(err,book){
+                books.push(book);
                 replies++;
                 if (replies == reply.length) {
                     callback(err, books);
