@@ -29,7 +29,28 @@ vows.describe('Books').addBatch({
         },
         'has NumberOfPages': function(err, book) {
             assert.equal(book.ItemAttributes.NumberOfPages, "848");
+        }
+    }
+}).addBatch({
+    'Retrieve Book': {
+        topic: function() {
+            books.query_book(client,"9780060733353",this.callback);
         },
-        teardown: function() { client.quit()}
+        'has ASIN': function(book) {
+            assert.equal(book.ASIN, "0060733357");            
+        },
+        'has Title': function(err, book) {
+            assert.equal(book.ItemAttributes.Title, "The Confusion (The Baroque Cycle, Vol. 2)");
+        },
+        'has ISBN': function(err, book) {
+            assert.equal(book.ItemAttributes.ISBN, "0060733357");
+        },
+        'has Author': function(err, book) {
+            assert.equal(book.ItemAttributes.Author, "Neal Stephenson");
+        },
+        'has NumberOfPages': function(err, book) {
+            assert.equal(book.ItemAttributes.NumberOfPages, "848");
+        },
+        teardown: function() { client.quit();}
     }
 }).export(module);
