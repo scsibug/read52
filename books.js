@@ -77,7 +77,8 @@ exports.save_book = function(ean, callback) {
     });
 }
 
-exports.count_books = function(callback) {
+// How many books exist in the DB?
+exports.book_count = function(callback) {
     var client = rclient.getClient();
     client.zcard(bookzset,callback);
 }
