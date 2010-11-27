@@ -2,6 +2,7 @@
 // Stores all the metadata we get from Amazon's Product API.
 var sys = require('sys');
 require('underscore');
+var isbn = require('./isbn');
 var rclient = require('./redisclient');
 var book_lookup = require('./book_lookup');
 
@@ -15,15 +16,19 @@ var bookzset = "book_zset";
 
 exports.Book = function Book (ean,callback) {
     // need to check for valid EAN, or convert from ISBN-10
+    var ean = isbn.to_isbn_13(ean);
     var context = this;
     exports.get_book(ean,function(err,result) {
-            context.title = result.ItemAttributes.Title;
-            context.ean = result.ItemAttributes.EAN;
-            context.asin = result.ASIN;
-            context.author = result.ItemAttributes.Author;
-            context.isbn = result.ItemAttributes.ISBN;
-            context.number_of_pages = result.ItemAttributes.NumberOfPages;
-            callback(err,context);
+        context.title = result.ItemAttributes.Title;
+        context.ean = result.ItemAttributes.EAN;
+        context.asin = result.ASIN;
+        context.author = result.ItemAttributes.Author;
+        context.isbn = result.ItemAttributes.ISBN;
+        context.number_of_pages = result.ItemAttributes.NumberOfPages;
+        context.amz_img_small = result.SmallImage.URL;
+        context.amz_img_medium = result.MediumImage.URL;
+        context.amz_img_large = result.LargeImage.URL;
+        callback(err,context);
     });
 }
 

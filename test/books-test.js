@@ -34,7 +34,12 @@ vows.describe('Books').addBatch({
         },
         'has NumberOfPages': function(err, book) {
             assert.equal(book.number_of_pages, "848");
-        }
+        },
+        'has Images': function(err, book) {
+            assert.isString(book.amz_img_small);
+            assert.isString(book.amz_img_medium);
+            assert.isString(book.amz_img_large);
+        },
     }
 }).addBatch({
     'Key/EAN conversion': {
