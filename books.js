@@ -19,15 +19,23 @@ exports.Book = function Book (ean,callback) {
     var ean = isbn.to_isbn_13(ean);
     var context = this;
     exports.get_book(ean,function(err,result) {
+        context.raw = JSON.stringify(result,null, 2);
         context.title = result.ItemAttributes.Title;
         context.ean = result.ItemAttributes.EAN;
         context.asin = result.ASIN;
         context.author = result.ItemAttributes.Author;
         context.isbn = result.ItemAttributes.ISBN;
         context.number_of_pages = result.ItemAttributes.NumberOfPages;
-        context.amz_img_small = result.SmallImage.URL;
-        context.amz_img_medium = result.MediumImage.URL;
-        context.amz_img_large = result.LargeImage.URL;
+        if (!_.isUndefined(result.SmallImage)) {
+            context.amz_img_small = result.SmallImage.URL;
+        }
+        if (!_.isUndefined(result.MediumImage)) {
+            context.amz_img_medium = result.MediumImage.URL;
+        }
+        if (!_.isUndefined(result.LargeImage)) {
+            context.amz_img_large = result.LargeImage.URL;
+        }
+        context.amz_detail_url = result.DetailPageURL;
         callback(err,context);
     });
 }

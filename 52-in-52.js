@@ -46,11 +46,21 @@ app.get('/books/:id', function(req, res) {
     });
 });
 
+// Show raw AMZ information
+app.get('/books/:id/amz', function(req, res) {
+    new books.Book(req.params.id, function(err,b) {
+        res.send(b.raw);
+    });
+});
+
 // Force an update of book metadata... mostly useful for debugging
 app.post('/books/:id/update', function(req, res) {
     sys.print("Forcing an update of "+req.params.id+" via AWS\n");
-    books.save_book(req.params.id,function() {});
-    res.redirect('/books/'+req.params.id, 200);
+    books.save_book(req.params.id,function() {
+        new books.Book(req.params.id, function(err,b) {
+            res.redirect('/books/'+b.ean, 200);
+        });
+    });
 });
 
 // Static files.  Keep this last so it doesn't interfere with dynamic routes.

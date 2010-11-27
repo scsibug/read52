@@ -40,6 +40,9 @@ vows.describe('Books').addBatch({
             assert.isString(book.amz_img_medium);
             assert.isString(book.amz_img_large);
         },
+        'has Amazon details page': function(err, book) {
+            assert.isString(book.amz_detail_url);
+        },
     }
 }).addBatch({
     'Key/EAN conversion': {

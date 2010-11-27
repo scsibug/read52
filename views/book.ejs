@@ -1,13 +1,27 @@
-<h1>Book information for <%= book.ean %></h1>
-<div>
+<div class="span-24 last">
+<h1><%= book.title %></h1>
+</div>
+
+<div class="span-12">
 <img src="<%= book.amz_img_large %>">
 </div>
+
+<div class="span-12 last">
 <dl>
-<dt>Title</dt><dd><%= book.title %></dd>
-<dt>ASIN</dt><dd><%= book.asin %></dd>
-<dt>ISBN</dt><dd><%= book.isbn %></dd>
+<dt>ASIN/ISBN</dt><dd><%= book.asin %></dd>
+
+<% if (book.ean) { %>
 <dt>EAN/ISBN-13</dt><dd><%= book.ean %></dd>
+<% } %>
+
+<% if (book.author) { %>
 <dt>Author</dt><dd><%= book.author %></dd>
-<dt>Pages</dt><dd><%= book.pages %></dd>
+<% } %>
+
+<% if (book.number_of_pages) { %>
+<dt>Pages</dt><dd><%= book.number_of_pages %></dd>
+<% } %>
+
 <dt>Details</dt><dd><a href="<%= book.amz_detail_url %>">Amazon Page</a></dd>
 </dl>
+</div>
