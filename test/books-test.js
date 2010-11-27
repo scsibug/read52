@@ -52,6 +52,20 @@ vows.describe('Books').addBatch({
             var context = this;
             // flush db, add two books, and get a full list.
             client.flushdb(function() {
+                books.list_books(0,99,context.callback);
+            });
+        },
+        'No books returns array': function(err,booklist) {
+            assert.isTrue(_.isArray(booklist));
+            assert.equal(booklist.length,0);
+        },
+    }
+}).addBatch({
+    'Book Listing': {
+        topic: function() {
+            var context = this;
+            // flush db, add two books, and get a full list.
+            client.flushdb(function() {
                 new books.Book("9780060733353",function(err,book) {
                     new books.Book("9780471292524",function(err,book) {
                         books.list_books(0,99,context.callback);

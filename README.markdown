@@ -5,7 +5,7 @@
 * apac@latest
 * underscore
 * ejs
-* node_redis
+* node_redis ("redis" on npm)
 * vows (testing)
 
 Included:

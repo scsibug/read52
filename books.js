@@ -94,8 +94,12 @@ exports.list_books = function(start, end, callback) {
     client.zrange(bookzset,start,end, function(err,reply){
         var replies = 0;
         var books = new Array();
-        if (err) {
-            sys.print('Error: ' + err + "\n");
+        if (_.isNull(reply)) {
+            if (err) {
+                sys.print('Error: ' + err + "\n");
+            }
+            callback(err,books);
+            return;
         }
         for(var i=0; i < reply.length; i++) {
             var ean = exports.ean_from_key(reply[i].toString());
