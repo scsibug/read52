@@ -5,17 +5,50 @@ var books = require("./books");
 var users = require("./users");
 var rclient = require('./redisclient');
 var client = rclient.initClient(99);
+var auth = require('connect-auth')
 var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
 // Enable cookies/sessions (stored in memory)
-app.use(express.cookieDecoder());
-app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
+
+var validatePasswordFunction = function(username, password, successCallback, failureCallback){
+    if (username === 'foo' && password === "bar"){
+        successCallback();
+    } else {
+        failureCallback();
+    }
+};
+
+app.configure(function() {
+    app.use(express.cookieDecoder());
+    app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
+    app.use(auth( [
+        auth.Basic({validatePassword: validatePasswordFunction})
+    ]) );
+});
+
 // EJS is our default templating system
 app.set('view engine', 'ejs');
 
 // Front page
 app.get('/', function(req, res){
     res.send('hello world');
+});
+
+app.get('/login', function(req, res) {
+    req.authenticate(['basic'], function(error, authenticated) { 
+        res.send('Authenticated with HTTP-AUTH basic');
+    });
+});
+
+app.get('/private', function(req, res) {
+    var allowed_user = 'foo';
+    if( !req.isAuthenticated() ) {
+        res.send('This page should only be visible to user $foo');
+    } else if (req.getAuthDetails().user.username == allowed_user) {
+        res.send(JSON.stringify( req.getAuthDetails() ))
+    } else {
+        res.send("you don't belong here! " + JSON.stringify( req.getAuthDetails().user ) );
+    }
 });
 
 // List All Users

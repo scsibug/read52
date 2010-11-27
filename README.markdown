@@ -6,6 +6,7 @@
 * underscore
 * ejs
 * node_redis ("redis" on npm)
+* connect-auth
 * vows (testing)
 
 Included:
