@@ -5,9 +5,11 @@ var books = require("./books");
 var users = require("./users");
 var rclient = require('./redisclient');
 var client = rclient.initClient(99);
-
+var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
-
+// Enable cookies/sessions (stored in memory)
+app.use(express.cookieDecoder());
+app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
 // EJS is our default templating system
 app.set('view engine', 'ejs');
 
