@@ -1,4 +1,4 @@
-Requirements:
+== Requirements ==
 
 * express 1.0
 * connect 0.3.0
@@ -7,3 +7,7 @@ Requirements:
 * ejs
 * node_redis
 * vows (testing)
+
+Included:
+
+* isbnjs (MIT licensed by hetappi.pm, http://code.google.com/p/isbnjs/)
