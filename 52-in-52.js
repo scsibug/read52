@@ -20,7 +20,6 @@ app.get('/', function(req, res){
 app.get('/users', function(req, res){
     var userlist = "<h1>User List</h1><br />"
     users.listUsers(
-        client,
         function(name) {userlist+=String(name+"<br />")},
         function() {res.send(userlist)}
     );
@@ -40,9 +39,9 @@ app.get('/books', function(req, res){
 
 // Get book information from amazon
 app.get('/books/:id', function(req, res) {
-    books.get_book(client, req.params.id, function (book) {
+    new books.Book(req.params.id, function(err,b) {
         res.render('book', {
-            locals: { title: book.title, book: book }
+            locals: { title: b.title, book: b }
         });
     });
 });
@@ -50,7 +49,7 @@ app.get('/books/:id', function(req, res) {
 // Force an update of book metadata... mostly useful for debugging
 app.post('/books/:id/update', function(req, res) {
     sys.print("Forcing an update of "+req.params.id+" via AWS\n");
-    books.save_book(client, req.params.id);
+    books.save_book(req.params.id,function() {});
     res.redirect('/books/'+req.params.id, 200);
 });
 
