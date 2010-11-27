@@ -1,9 +1,10 @@
 var express = require('express');
 var sys = require('sys');
+require('underscore');
 var books = require("./books");
 var users = require("./users");
-var redis = require("redis"),
-    client = redis.createClient();
+var rclient = require('./redisclient');
+var client = rclient.initClient(99);
 
 var app = express.createServer();
 
@@ -28,10 +29,13 @@ app.get('/users', function(req, res){
 // List All Books
 app.get('/books', function(req, res){
     var booklist = "<h1>Book List</h1><br />"
-    books.listBooks(client,
-              function(title) {booklist+=String(title+"<br />")},
-              function() {res.send(booklist)}
-             );
+    books.list_books(0,100, function(err,booklist) {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        _.each(booklist,function(book) {
+            res.write(book.ean +" --> "+ book.title+"\n",'utf8')
+        });
+        res.end();
+    });
 });
 
 // Get book information from amazon

@@ -18,7 +18,6 @@ vows.describe('ISBN').addBatch({
         },
         'convert to ISBN-13': function(isbns) {
             _.each(isbns, function(isbn_13,isbn_10) {
-                sys.print("input is "+isbn_10+" and "+isbn_13+"\n");
                 assert.equal(isbn_13, isbn.to_isbn_13(isbn_10));
             });
         },

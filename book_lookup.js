@@ -1,6 +1,7 @@
 var sys = require('sys'),
 OperationHelper = require('apac').OperationHelper;
 require('underscore');
+var isbnlib = require('./isbn');
 var aws_credentials = require('./aws_cred');
 
 opHelper = new OperationHelper({
@@ -10,22 +11,17 @@ opHelper = new OperationHelper({
 });
 
 // Lookup a book by ISBN-13, and get product information from AWS
-isbn_lookup_unthrottled = function(isbn, callback) {
-    // strip out dashes/spaces from ISBN
-    isbn_clean = isbn.replace(/-/g,"");
-    var idtype = "EAN";
-    if (isbn_clean.length == 13) {
-        idtype="EAN"
-    } else if (isbn_clean.length == 10) {
-        idtype="ISBN"
-    } else {
-        sys.print("ISBN length is incorrect, must be 10 or 13 ("+isbn_clean+")\n");
-        return;
+isbn_lookup_unthrottled = function(isbn_dirty, callback) {
+    // normalize ISBN to 13:
+    var isbn = isbnlib.to_isbn_13(isbn_dirty)
+    if (_.isNull(isbn)) {
+        sys.print("Provided ISBN could not be parsed. ("+isbn+")\n");
     }
+    var idtype = "EAN";
     opHelper.execute('ItemLookup', {
         'SearchIndex': 'Books',
         'IdType': idtype,
-        'ItemId': isbn_clean,
+        'ItemId': isbn,
         'ResponseGroup': 'ItemAttributes,Images'
     }, function(error, results) {
         if (error) { sys.print('Error: ' + error + "\n") }

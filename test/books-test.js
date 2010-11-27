@@ -1,10 +1,9 @@
 var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
-var rclient = require('../redisclient');
 var books = require('../books');
+var rclient = require('../redisclient');
 var client = rclient.initClient(99);
-rclient.getClient();
 client.flushdb();
 
 vows.describe('Books').addBatch({
