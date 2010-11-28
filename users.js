@@ -32,15 +32,12 @@ exports.make_user_key = function(callback) {
 
 // Get/Create user by email address.
 exports.User = function User (email, callback) {
-    sys.print("User creation\n");
     var client = rclient.getClient();
     var context = this;
     // Check if a user with this email exists.
     exports.key_from_email(email,function(err,result) {
-        sys.print(sys.inspect(result)+"\n");
         // User exists, create and return object
         if (!_.isUndefined(result) && !_.isNull(result)) {
-            sys.print("key_from_email exists, need to retrieve existing user\n");
             client.get(key_from_id(result), function(err,result) {
                 context = JSON.parse(result);
                 callback(err,context);

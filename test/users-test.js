@@ -21,6 +21,11 @@ vows.describe('Users').addBatch({
         'has email': function(err, user) {
             assert.equal(user.email, "scsibug@imap.cc");
         },
+        'unique ID': function(err,user) {
+            var user2 = new users.User("user@example.com",function(err,res) {
+                assert.notEqual(user.id,user2.id)
+            });
+        },
         teardown: function() {rclient.quit();} // do this in last batch, to ensure clean exit.
     }
 }).export(module);
