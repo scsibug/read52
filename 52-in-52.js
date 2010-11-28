@@ -11,14 +11,6 @@ var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
 // Enable cookies/sessions (stored in memory)
 
-var validatePasswordFunction = function(username, password, successCallback, failureCallback){
-    if (username === 'foo' && password === "bar"){
-        successCallback();
-    } else {
-        failureCallback();
-    }
-};
-sys.print(sys.inspect(form_strategy()));
 app.configure(function() {
     app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
@@ -39,6 +31,18 @@ app.get('/login', function(req, res) {
     res.render('login', {
         locals: { title: "Login" }
     });
+});
+
+// Registration Form
+app.get('/register', function(req, res) {
+    res.render('register', {
+        locals: { title: "Create New Account" }
+    });
+});
+
+// Registration Processing
+app.post('/register', function(req, res) {
+
 });
 
 // Process logins
