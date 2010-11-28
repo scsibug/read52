@@ -1,4 +1,4 @@
-apac_credentials.js
+aws_cred.js
 lib-cov
 *.seed
 *.log
