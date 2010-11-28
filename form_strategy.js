@@ -6,7 +6,6 @@ module.exports= function(options) {
     var my= {}; 
     that.name     = options.name || "form";
     that.authenticate= function(request, response, callback) {
-        sys.print("Form Authenticate called\n");
         this.success( {id:'1', name:'someUser'}, callback );
     }
     return that;
