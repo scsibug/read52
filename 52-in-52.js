@@ -6,6 +6,7 @@ var users = require("./users");
 var rclient = require('./redisclient');
 var client = rclient.initClient(99);
 var auth = require('connect-auth')
+var form_strategy = require('./form_strategy');
 var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
 // Enable cookies/sessions (stored in memory)
@@ -17,13 +18,12 @@ var validatePasswordFunction = function(username, password, successCallback, fai
         failureCallback();
     }
 };
-
+sys.print(sys.inspect(form_strategy()));
 app.configure(function() {
+    app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
     app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
-    app.use(auth( [
-        auth.Basic({validatePassword: validatePasswordFunction})
-    ]) );
+    app.use(auth(form_strategy()));
 });
 
 // EJS is our default templating system
@@ -34,20 +34,26 @@ app.get('/', function(req, res){
     res.send('hello world');
 });
 
+// Display login screen
 app.get('/login', function(req, res) {
-    req.authenticate(['basic'], function(error, authenticated) { 
-        res.send('Authenticated with HTTP-AUTH basic');
+    res.render('login', {
+        locals: { title: "Login" }
+    });
+});
+
+// Process logins
+app.post('/login', function(req, res) {
+    req.authenticate(["form"], function(error, authenticated) {
+        sys.print("POST to login, authenticate callback called\n")
+        res.send(sys.inspect(authenticated));
     });
 });
 
 app.get('/private', function(req, res) {
-    var allowed_user = 'foo';
     if( !req.isAuthenticated() ) {
-        res.send('This page should only be visible to user $foo');
-    } else if (req.getAuthDetails().user.username == allowed_user) {
-        res.send(JSON.stringify( req.getAuthDetails() ))
+        res.send("You are not authenticated");
     } else {
-        res.send("you don't belong here! " + JSON.stringify( req.getAuthDetails().user ) );
+        res.send("you are authenticated!\n " + JSON.stringify( req.getAuthDetails().user ) );
     }
 });
 
