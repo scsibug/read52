@@ -5,7 +5,6 @@ var books = require('../books');
 var rclient = require('../redisclient');
 var client = rclient.initClient(99);
 client.flushdb();
-
 vows.describe('Books').addBatch({
     'Create Book': {
         topic: function() {
@@ -98,6 +97,8 @@ vows.describe('Books').addBatch({
                 assert.equal(booklist.length, result);
             });
         },
-        teardown: function() {rclient.quit();} // do this in last batch, to ensure clean exit.
+        teardown: function() {
+            client.quit();
+        }
     }
 }).export(module);

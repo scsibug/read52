@@ -9,7 +9,6 @@ var client;
 var db = 0;
 
 exports.initClient = function(select_db) {
-    sys.print("initializing client\n");
     client = redis.createClient();
     if (select_db) {db = select_db;}
     client.select(db,function(){});
@@ -18,13 +17,12 @@ exports.initClient = function(select_db) {
 
 exports.getClient = function() {
     if (_.isUndefined(client)) {
-            sys.print("Error: client has not been initialized\n");
+        sys.print("Error: client has not been initialized\n");
     }
     return client;
 }
 
-exports.quit = function(callback) {
-    var quitting = client;
-    quitting.quit(callback);
-    client = undefined;
-}
+//exports.quit = function(callback) {
+//    var quitting = client;
+//    client = undefined;
+//}

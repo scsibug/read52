@@ -26,6 +26,8 @@ vows.describe('Users').addBatch({
                 assert.notEqual(user.id,user2.id)
             });
         },
-        teardown: function() {rclient.quit();} // do this in last batch, to ensure clean exit.
+        teardown: function() {
+            client.quit();
+        } // do this in last batch, to ensure clean exit.
     }
 }).export(module);
