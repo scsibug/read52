@@ -40,6 +40,10 @@ app.get('/register', function(req, res) {
     });
 });
 
+app.post('/register', function(req, res) {
+    res.redirect('/',303);
+});
+
 // Registration Processing
 app.post('/register', function(req, res) {
 
