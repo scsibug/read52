@@ -42,6 +42,27 @@ vows.describe('Users').addBatch({
         }
     }
 }).addBatch({
+    'Password': {
+        topic: function() {
+            var context = this;
+            client.flushdb(function() {
+                new users.User("user@example.com",function(err,user) {
+                    context.callback(err, user);
+                });
+            });
+        },
+        'set/check password': function(err,user) {
+            user.setPassword("espresso", function(err,res) {
+                user.checkPassword("espresso", function(err,res) {
+                    assert.isTrue(res);
+                });
+                user.checkPassword("espress0", function(err,res) {
+                    assert.isFalse(res);
+                });
+            });
+        }
+    }
+}).addBatch({
     'Close Connection (HACK for nested context teardown bug)': {
         topic: function() {
             return 1;

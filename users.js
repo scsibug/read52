@@ -44,7 +44,7 @@ exports.make_user_id = function(callback) {
 }
 
 // Get/Create user by email address.
-exports.User = function User (email, callback) {
+function User (email, callback) {
     var client = rclient.getClient();
     var context = this;
 // Check if a user with this email exists.
@@ -74,3 +74,14 @@ exports.User = function User (email, callback) {
         }
     });
 }
+
+User.prototype.setPassword = function setPassword(pass,callback) {
+    this.password = pass
+    callback(null,null);
+};
+
+User.prototype.checkPassword = function checkPassword(pass,callback) {
+    callback(null,(this.password == pass));
+};
+
+exports.User = User;
