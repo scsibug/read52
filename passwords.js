@@ -21,7 +21,8 @@ exports.hash = function(password) {
     var hash = crypto.createHash(algo);
     var salt = exports.create_salt();
     hash.update(form_raw_pw(password,salt));
-    return hash.digest(encoding);
+    return {'hashed_pw':(hash.digest(encoding)),
+            'salt':salt};
 }
 
 // Test a password against a hashed password and salt.

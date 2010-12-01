@@ -1,7 +1,7 @@
 // Module to manage users
 var sys = require('sys');
 var rclient = require('./redisclient');
-
+var pw = require('./passwords');
 // We store users by a unique numeric ID.
 // We also maintain a mapping of email addresses -> ID's
 
@@ -76,12 +76,14 @@ function User (email, callback) {
 }
 
 User.prototype.setPassword = function setPassword(pass,callback) {
-    this.password = pass
-    callback(null,null);
+    var pw_safe = pw.hash(pass);
+    this.password = pw_safe.hashed_pw;
+    this.salt = pw_safe.salt;
+    callback(null,null); //eventually will be redis callback result
 };
 
-User.prototype.checkPassword = function checkPassword(pass,callback) {
-    callback(null,(this.password == pass));
+User.prototype.checkPassword = function checkPassword(test_pass,callback) {
+    callback(null,(pw.validate(this.password, this.salt, test_pass)));
 };
 
 exports.User = User;
