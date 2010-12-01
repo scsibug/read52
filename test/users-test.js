@@ -64,6 +64,16 @@ vows.describe('Users').addBatch({
         'password not plaintext': function(err,user) {
             assert.notEqual(user.password,"espresso");
         },
+        'password retrieved from DB': function(err,user) {
+            new users.User("user@example.com",function(err,dbuser) {
+                dbuser.checkPassword("espresso", function(err,res) {
+                    assert.isTrue(res);
+                });
+                dbuser.checkPassword("espress0", function(err,res) {
+                    assert.isFalse(res);
+                });
+            });
+        }
     }
 }).addBatch({
     'Close Connection (HACK for nested context teardown bug)': {

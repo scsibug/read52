@@ -60,6 +60,7 @@ function User (email, callback) {
             // Create new user from scratch, save in DB
             exports.make_user_id(function(err,result) {
                 if (err) {sys.print("Error: "+err+"\n");callback(err,undefined);}
+                context.id = result;
                 context.email = email;
                 context.id = result;
                 context.creation_date = new Date();
@@ -75,11 +76,23 @@ function User (email, callback) {
     });
 }
 
+User.prototype.save = function save(callback) {
+    var client = rclient.getClient();
+    var context = this;
+    var obj_string = JSON.stringify(context);
+    client.set(key_from_id(context.id),obj_string, function(err,r) {
+        set_email_key(context.email,context.id,function() {
+            callback(err,context);
+            return context;
+        });        
+    });
+}
+
 User.prototype.setPassword = function setPassword(pass,callback) {
     var pw_safe = pw.hash(pass);
     this.password = pw_safe.hashed_pw;
     this.salt = pw_safe.salt;
-    callback(null,null); //eventually will be redis callback result
+    this.save(callback);
 };
 
 User.prototype.checkPassword = function checkPassword(test_pass,callback) {
