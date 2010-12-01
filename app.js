@@ -4,7 +4,7 @@ require('underscore');
 var books = require("./books");
 var users = require("./users");
 var rclient = require('./redisclient');
-var client = rclient.initClient(99);
+var client = rclient.initClient();
 var auth = require('connect-auth')
 var form_strategy = require('./form_strategy');
 var MemoryStore = require('connect/middleware/session/memory');
