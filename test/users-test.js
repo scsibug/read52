@@ -38,6 +38,9 @@ vows.describe('Users').addBatch({
             },
             'unique ID': function(err,user1,user2) {
                 assert.notEqual(user1.id,user2.id);
+            },
+            'has methods': function(err,user1,user2) {
+                assert.isFunction(user2.setPassword);
             }
         }
     }

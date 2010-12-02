@@ -52,7 +52,8 @@ function User (email, callback) {
         // User exists, pull from DB
         if (!_.isUndefined(result) && !_.isNull(result)) {
             client.get(key_from_id(result), function(err,result) {
-                context = JSON.parse(result);
+                var json = JSON.parse(result);
+                context.load_from_json(json);
                 callback(err,context);
                 return context;
             });
@@ -74,6 +75,15 @@ function User (email, callback) {
             });
         }
     });
+}
+
+User.prototype.load_from_json = function(json) {
+    this.id = json.id;
+    this.name = json.name;
+    this.email = json.email;
+    this.creation_date = json.creation_date;
+    this.password = json.password;
+    this.salt = json.salt;
 }
 
 User.prototype.save = function save(callback) {

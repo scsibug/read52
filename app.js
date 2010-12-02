@@ -41,8 +41,11 @@ app.get('/register', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-    
-    res.redirect('/',303);
+    new users.User(req.body.email,function(err,user) {
+        user.setPassword(req.body.password,function(err,result) {
+            res.redirect('/',303);
+        });
+    });
 });
 
 // Registration Processing
