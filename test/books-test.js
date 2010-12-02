@@ -4,6 +4,7 @@ var sys = require('sys'),
 var books = require('../books');
 var rclient = require('../redisclient');
 var client = rclient.initClient(15);
+var _ = require('underscore');
 client.flushdb();
 vows.describe('Books').addBatch({
     'Create Book': {

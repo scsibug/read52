@@ -3,7 +3,7 @@
 // Also allows us to select a database within Redis.
 var sys = require('sys');
 var redis = require("redis");
-require("underscore");
+var _ = require("underscore");
 
 var client;
 var db = 0;

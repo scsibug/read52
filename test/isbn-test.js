@@ -2,7 +2,7 @@ var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
 var isbn = require('../isbn');
-require('underscore');
+var _ = require('underscore');
 
 vows.describe('ISBN').addBatch({
     'Conversion': {

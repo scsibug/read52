@@ -1,7 +1,7 @@
 // Module to manage books
 // Stores all the metadata we get from Amazon's Product API.
 var sys = require('sys');
-require('underscore');
+var _ = require('underscore');
 var isbn = require('./isbn');
 var rclient = require('./redisclient');
 var book_lookup = require('./book_lookup');

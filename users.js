@@ -2,6 +2,7 @@
 var sys = require('sys');
 var rclient = require('./redisclient');
 var pw = require('./passwords');
+var _ = require('underscore');
 // We store users by a unique numeric ID.
 // We also maintain a mapping of email addresses -> ID's
 

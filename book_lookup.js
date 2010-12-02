@@ -1,6 +1,6 @@
 var sys = require('sys'),
 OperationHelper = require('apac').OperationHelper;
-require('underscore');
+var _ = require('underscore');
 var isbnlib = require('./isbn');
 var aws_credentials = require('./aws_cred');
 
