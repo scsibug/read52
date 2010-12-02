@@ -18,11 +18,10 @@ vows.describe('Passwords').addBatch({
     'Password Hashing': {
         topic: function() {
             var this_pw = 'NodeRulez!';
-            var this_salt = pw.create_salt();
-            var this_hash = pw.hash(this_pw,this_salt);
+            var hash = pw.hash(this_pw);
             return {password: this_pw,
-                    salt: this_salt,
-                    hash: this_hash,
+                    salt: hash.salt,
+                    hash: hash.hashed_pw
                    };
         },
         'validation of correct password': function(data) {

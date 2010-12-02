@@ -48,11 +48,6 @@ app.post('/register', function(req, res) {
     });
 });
 
-// Registration Processing
-app.post('/register', function(req, res) {
-
-});
-
 // Process logins
 app.post('/login', function(req, res) {
     req.authenticate(["form"], function(error, authenticated) {

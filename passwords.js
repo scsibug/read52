@@ -29,5 +29,5 @@ exports.hash = function(password) {
 exports.validate = function(hashed_pw, salt, test_password) {
     var testpw = crypto.createHash(algo);
     testpw.update(form_raw_pw(test_password,salt));
-    return hashed_pw == testpw.digest(encoding);
+    return (hashed_pw == testpw.digest(encoding));
 }
