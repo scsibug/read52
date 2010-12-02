@@ -41,10 +41,8 @@ app.get('/register', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-    new users.User(req.body.email,function(err,user) {
-        user.setPassword(req.body.password,function(err,result) {
-            res.redirect('/',303);
-        });
+    users.create_user(req.body.email, req.body.user, req.body.password, function(err,user) {
+        res.redirect('/',303);
     });
 });
 

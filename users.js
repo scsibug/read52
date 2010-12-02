@@ -39,16 +39,23 @@ var key_from_id = function (id) {
 
 // Create a new unique user ID
 exports.make_user_id = function(callback) {
-    sys.print("make_user_id called\n");
     var client = rclient.getClient();
     client.incr(user_incr,callback);
 }
 
+exports.get_user = function(email, callback) {
+    new User(email,null, null, false, callback);
+}
+
+exports.create_user = function(email, name, password, callback) {
+    new User(email, name, password, true, callback);
+}
+
 // Get/Create user by email address.
-function User (email, callback) {
+function User (email, name, password, create, callback) { 
     var client = rclient.getClient();
     var context = this;
-// Check if a user with this email exists.
+    // Check if a user with this email exists.
     exports.key_from_email(email,function(err,result) {
         // User exists, pull from DB
         if (!_.isUndefined(result) && !_.isNull(result)) {
@@ -58,19 +65,23 @@ function User (email, callback) {
                 callback(err,context);
                 return context;
             });
-        } else {
+        } else if (!create) {
+            callback("Could not find user "+email);
+        } else if (create) {
             // Create new user from scratch, save in DB
             exports.make_user_id(function(err,result) {
-                if (err) {sys.print("Error: "+err+"\n");callback(err,undefined);}
+                if (err) {sys.print("Error: "+err+"\n");callback(err, null);}
                 context.id = result;
                 context.email = email;
                 context.id = result;
                 context.creation_date = new Date();
                 var obj_string = JSON.stringify(context);
                 client.set(key_from_id(result), obj_string, function(err,r) {
-                    set_email_key(email,result,function() {
-                        callback(err,context);
-                        return context;
+                    context.setPassword(password,function() {
+                        set_email_key(email,result,function() {
+                            callback(err,context);
+                            return context;
+                        });
                     });
                 });
             });

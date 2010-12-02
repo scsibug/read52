@@ -11,7 +11,7 @@ vows.describe('Users').addBatch({
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                new users.User("scsibug@imap.cc",function(err,res) {
+                new users.create_user("scsibug@imap.cc","Greg","123",function(err,res) {
                     context.callback(err,res);
                 });
             });
@@ -29,7 +29,7 @@ vows.describe('Users').addBatch({
         ', Second User': {
             topic: function(user1) {
                 var context = this;
-                new users.User("user@example.com",function(err,user2) {
+                new users.create_user("user@example.com","user","123",function(err,user2) {
                     context.callback(err, user1, user2);
                 });
             },
@@ -49,7 +49,7 @@ vows.describe('Users').addBatch({
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                new users.User("user@example.com",function(err,user) {
+                users.create_user("user@example.com","user","123",function(err,user) {
                     user.setPassword("espresso", function(err,res) {
                         context.callback(err, user);
                     });
@@ -68,7 +68,7 @@ vows.describe('Users').addBatch({
             assert.notEqual(user.password,"espresso");
         },
         'password retrieved from DB': function(err,user) {
-            new users.User("user@example.com",function(err,dbuser) {
+            users.get_user("user@example.com",function(err,dbuser) {
                 dbuser.checkPassword("espresso", function(err,res) {
                     assert.isTrue(res);
                 });
