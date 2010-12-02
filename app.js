@@ -1,6 +1,6 @@
 var express = require('express');
 var sys = require('sys');
-require('underscore');
+var _ = require('underscore');
 var books = require("./books");
 var users = require("./users");
 var rclient = require('./redisclient');
