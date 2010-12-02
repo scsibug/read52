@@ -73,13 +73,11 @@ app.get('/users', function(req, res){
 
 // List All Books
 app.get('/books', function(req, res){
-    var booklist = "<h1>Book List</h1><br />"
-    books.list_books(0,100, function(err,booklist) {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        _.each(booklist,function(book) {
-            res.write(book.ean +" --> "+ book.title+"\n",'utf8')
-        });
-        res.end();
+    books.list_books(0,100, function(err, booklist) {
+        //sys.print(sys.inspect(booklist))
+        res.render('books', {
+            locals: { books: booklist, title: "book list" }
+        });       
     });
 });
 
