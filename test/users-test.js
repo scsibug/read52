@@ -7,7 +7,7 @@ require('underscore');
 var client = rclient.initClient(15);
 
 vows.describe('Users').addBatch({
-    'Create User': {
+    'A user': {
         topic: function() {
             var context = this;
             client.flushdb(function() {
@@ -26,7 +26,7 @@ vows.describe('Users').addBatch({
         'has creation date': function(err, user) {
             assert.instanceOf(user.creation_date,Date);
         },
-        ', Second User': {
+        'and a second user': {
             topic: function(user1) {
                 var context = this;
                 new users.create_user("user@example.com","user","123",function(err,user2) {
@@ -46,36 +46,42 @@ vows.describe('Users').addBatch({
     }
 }).addBatch({
     'Password': {
-        topic: function() {
-            var context = this;
-            client.flushdb(function() {
-                users.create_user("user@example.com","user","123",function(err,user) {
-                    user.setPassword("espresso", function(err,res) {
-                        context.callback(err, user);
+        topic: "espresso",
+        'for new user': {
+            topic: function(pw) {
+                var context = this;
+                client.flushdb(function() {
+                    users.create_user("user@example.com","user","123",function(err,user) {
+                        user.setPassword(pw, function(err,res) {
+                            context.callback(err, user, pw);
+                        });
                     });
                 });
-            });
-        },
-        'check password': function(err,user) {
-            user.checkPassword("espresso", function(err,res) {
-                assert.isTrue(res);
-            });
-            user.checkPassword("espress0", function(err,res) {
-                assert.isFalse(res);
-            });
-        },
-        'password not plaintext': function(err,user) {
-            assert.notEqual(user.password,"espresso");
-        },
-        'password retrieved from DB': function(err,user) {
-            users.get_user("user@example.com",function(err,dbuser) {
-                dbuser.checkPassword("espresso", function(err,res) {
+            },
+            'check password': function(err,user,pw) {
+                user.checkPassword(pw, function(err,res) {
                     assert.isTrue(res);
                 });
-                dbuser.checkPassword("espress0", function(err,res) {
+                user.checkPassword(pw+"0", function(err,res) {
                     assert.isFalse(res);
                 });
-            });
+            },
+            'password not plaintext': function(err,user) {
+                assert.notEqual(user.password,"espresso");
+            },
+            'and retrieved user': {
+                topic: function (user1,pw) {
+                    var context = this;
+                    users.get_user(user1.email,function(err,dbuser) {
+                        dbuser.checkPassword(pw, function(err,res) {
+                            context.callback(err,res);
+                        });
+                    });
+                },
+                'password matches': function(err,res) {
+                    assert.isTrue(res);
+                },
+            }
         }
     }
 }).addBatch({
