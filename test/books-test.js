@@ -93,10 +93,16 @@ vows.describe('Books').addBatch({
             assert.equal(booklist[0].title, "The Confusion (The Baroque Cycle, Vol. 2)");
             assert.equal(booklist[1].title,"Developing Products in Half the Time: New Rules, New Tools, 2nd Edition");
         },
-        'matches count': function(err, booklist) {
-            books.book_count(function(err,result){
-                assert.equal(booklist.length, result);
-            });
+        'count': {
+            topic: function(booklist) {
+                var context = this;
+                books.book_count(function(err,count) {
+                    context.callback(err,count,booklist);
+                });
+            },
+            'matches count': function(err, count, booklist) {
+                assert.equal(booklist.length, count);
+            }
         },
         teardown: function() {
             client.quit();
