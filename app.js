@@ -52,9 +52,14 @@ app.post('/login', function(req, res) {
         if (authenticated) {
             res.redirect('/user/'+req.getAuthDetails().user.id);
         } else {
-            res.redirect('/login'); //
+            res.redirect('/login');
         }
     });
+});
+
+app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
 });
 
 app.get('/user/:id', function(req, res) {
