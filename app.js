@@ -49,8 +49,22 @@ app.post('/register', function(req, res) {
 // Process logins
 app.post('/login', function(req, res) {
     req.authenticate(["form"], function(error, authenticated) {
-        res.send(sys.inspect(authenticated));
+        if (authenticated) {
+            res.redirect('/user/'+req.getAuthDetails().user.id);
+        } else {
+            res.redirect('/login'); //
+        }
     });
+});
+
+app.get('/user/:id', function(req, res) {
+    if (req.isAuthenticated()) {
+        res.render('user', {
+            locals: {title: "User", user: req.getAuthDetails().user}
+        });
+    } else {
+        res.redirect('/login');
+    }
 });
 
 app.get('/private', function(req, res) {
@@ -61,17 +75,8 @@ app.get('/private', function(req, res) {
     }
 });
 
-// List All Users
-app.get('/users', function(req, res){
-    var userlist = "<h1>User List</h1><br />"
-    users.listUsers(
-        function(name) {userlist+=String(name+"<br />")},
-        function() {res.send(userlist)}
-    );
-});
-
 // List All Books
-app.get('/books', function(req, res){
+app.get('/book', function(req, res){
     books.list_books(0,100, function(err, booklist) {
         res.render('books', {
             locals: { books: booklist, title: "book list" }
@@ -80,7 +85,7 @@ app.get('/books', function(req, res){
 });
 
 // Get book information from amazon
-app.get('/books/:id', function(req, res) {
+app.get('/book/:id', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
         res.render('book', {
             locals: { title: b.title, book: b }
@@ -89,18 +94,18 @@ app.get('/books/:id', function(req, res) {
 });
 
 // Show raw AMZ information
-app.get('/books/:id/amz', function(req, res) {
+app.get('/book/:id/amz', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
         res.send(b.raw);
     });
 });
 
 // Force an update of book metadata... mostly useful for debugging
-app.post('/books/:id/update', function(req, res) {
+app.post('/book/:id/update', function(req, res) {
     console.log("Forcing an update of ",req.params.id," via AWS");
     books.save_book(req.params.id,function() {
         new books.Book(req.params.id, function(err,b) {
-            res.redirect('/books/'+b.ean, 200);
+            res.redirect('/book/'+b.ean, 200);
         });
     });
 });
