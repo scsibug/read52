@@ -40,21 +40,4 @@ isbn_lookup_unthrottled = function(isbn_dirty, callback) {
 }
 
 // Amazon prefers 1 second between calls, or 503 errors become likely.
-var throttle_time = 1100
-var previous_run = 0;
-
-// This runs an ISBN lookup, ensuring that calls are spaced at least
-// 'throttle_time' apart.
-exports.isbn_lookup = function() {
-    var context = this, args = arguments;
-    var delta = +new Date() - previous_run;
-    previous_run = +new Date();
-    if (delta > throttle_time) {
-        isbn_lookup_unthrottled.apply(context,args);
-    } else {
-        sys.print("(throttling AWS for "+(throttle_time-delta)/1000+" seconds)\n");
-        setTimeout(function() {
-            isbn_lookup_unthrottled.apply(context,args);
-        }, throttle_time - delta);
-    }
-}
+exports.isbn_lookup = _.throttle(isbn_lookup_unthrottled, 1100);
