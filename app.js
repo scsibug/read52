@@ -41,7 +41,7 @@ app.get('/register', function(req, res) {
 });
 
 app.post('/register', function(req, res) {
-    users.create_user(req.body.email, req.body.user, req.body.password, function(err,user) {
+    users.create({email:req.body.email, name:req.body.user, password:req.body.password}, function(err,user) {
         res.redirect('/',303);
     });
 });
@@ -50,8 +50,10 @@ app.post('/register', function(req, res) {
 app.post('/login', function(req, res) {
     req.authenticate(["form"], function(error, authenticated) {
         if (authenticated) {
+            console.log("successful authentication");
             res.redirect('/user/'+req.getAuthDetails().user.id);
         } else {
+            console.log("authentication failed");
             res.redirect('/login');
         }
     });

@@ -17,7 +17,7 @@ module.exports= function(options) {
         if (!email || !password) {
             send_to_login(response);
         }
-        users.get_user(email, function(err, user) {
+        users.get_by_email(email, function(err, user) {
             if (!user || err) {
                 send_to_login(response);
             } else {

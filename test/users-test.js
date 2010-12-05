@@ -11,12 +11,15 @@ vows.describe('Users').addBatch({
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                new users.create_user("scsibug@imap.cc","Greg","123",function(err,res) {
+                new users.create({email:"scsibug@imap.cc",name:"Greg",password:"123"},function(err,res) {
                     context.callback(err,res);
                 });
             });
         },
         'has ID': function(err, user) {
+            if (err) {
+                console.log(err);
+            }
             assert.equal(user.id, 1);
             assert.equal(user.email, "scsibug@imap.cc");
         },
@@ -29,7 +32,7 @@ vows.describe('Users').addBatch({
         'and a second user': {
             topic: function(user1) {
                 var context = this;
-                new users.create_user("user@example.com","user","123",function(err,user2) {
+                new users.create({email:"user@example.com",name:"user",password:"123"},function(err,user2) {
                     context.callback(err, user1, user2);
                 });
             },
@@ -51,8 +54,9 @@ vows.describe('Users').addBatch({
             topic: function(pw) {
                 var context = this;
                 client.flushdb(function() {
-                    users.create_user("user@example.com","user","123",function(err,user) {
-                        user.setPassword(pw, function(err,res) {
+                    users.create({email:"user@example.com",name:"user",password:"123"},function(err,user) {
+                        user.setPassword(pw);
+                        user.save(function(err,res) {
                             context.callback(err, user, pw);
                         });
                     });
@@ -72,7 +76,7 @@ vows.describe('Users').addBatch({
             'and retrieved user': {
                 topic: function (user1,pw) {
                     var context = this;
-                    users.get_user(user1.email,function(err,dbuser) {
+                    users.get_by_email(user1.email,function(err,dbuser) {
                         dbuser.checkPassword(pw, function(err,res) {
                             context.callback(err,res);
                         });
