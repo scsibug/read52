@@ -49,7 +49,6 @@ app.post('/register', function(req, res) {
 // Process logins
 app.post('/login', function(req, res) {
     req.authenticate(["form"], function(error, authenticated) {
-        sys.print("POST to login, authenticate callback called\n")
         res.send(sys.inspect(authenticated));
     });
 });
@@ -74,7 +73,6 @@ app.get('/users', function(req, res){
 // List All Books
 app.get('/books', function(req, res){
     books.list_books(0,100, function(err, booklist) {
-        //sys.print(sys.inspect(booklist))
         res.render('books', {
             locals: { books: booklist, title: "book list" }
         });       
@@ -99,7 +97,7 @@ app.get('/books/:id/amz', function(req, res) {
 
 // Force an update of book metadata... mostly useful for debugging
 app.post('/books/:id/update', function(req, res) {
-    sys.print("Forcing an update of "+req.params.id+" via AWS\n");
+    console.log("Forcing an update of ",req.params.id," via AWS");
     books.save_book(req.params.id,function() {
         new books.Book(req.params.id, function(err,b) {
             res.redirect('/books/'+b.ean, 200);

@@ -15,7 +15,7 @@ isbn_lookup_unthrottled = function(isbn_dirty, callback) {
     // normalize ISBN to 13:
     var isbn = isbnlib.to_isbn_13(isbn_dirty)
     if (_.isNull(isbn)) {
-        sys.print("Provided ISBN could not be parsed. ("+isbn+")\n");
+        console.log("Provided ISBN could not be parsed:",isbn);
     }
     var idtype = "EAN";
     opHelper.execute('ItemLookup', {
@@ -24,16 +24,15 @@ isbn_lookup_unthrottled = function(isbn_dirty, callback) {
         'ItemId': isbn,
         'ResponseGroup': 'ItemAttributes,Images'
     }, function(error, results) {
-        if (error) { sys.print('Error: ' + error + "\n") }
-        //sys.print("Results:\n" + sys.inspect(results) + "\n");
+        if (error) { console.log("Error:",error); }
         if (!! _.isUndefined(results.Items.Item)) {
         } else if (results.Items.Item.constructor == Array) {
-            sys.print("This query returned multiple books, we'll just blindly take the first for now.");
+            console.log("This query returned multiple books, we'll just blindly take the first for now.");
             // We need to figure out which one of these items we should display...
             // for now we just take the first.
             callback(error, results.Items.Item.shift());
         } else {
-            //sys.print(sys.inspect(results.Items.Item));
+            //console.log(sys.inspect(results.Items.Item));
             callback(error, results.Items.Item);
         }
     });

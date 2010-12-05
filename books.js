@@ -48,7 +48,7 @@ exports.get_book = function(ean, callback) {
 
     client.get(exports.key_from_ean(ean), function(err,result) {
         if (err) {
-            sys.print('Error: ' + err + "\n");
+            console.log("Error:",err);
         } else if (result==null) {
             // book is not in database, need to query AWS and save
             exports.save_book(ean,callback);
@@ -76,14 +76,14 @@ exports.save_book = function(ean, callback) {
     var client = rclient.getClient();
     book_lookup.isbn_lookup(ean, function(err, result) {
         if (err) {
-            sys.print('Error: ' + err + "\n");
+            console.log("Error:",err);
             callback(err,null);
         } else {
             if(! _.isUndefined(result)) {
                 var book_key = exports.key_from_ean(ean);
                 client.set(book_key, JSON.stringify(result) ,function(err,set_result){
                     if (err) {
-                        sys.print('Error: ' + err + "\n");
+                        console.log("Error:",err);
                         callback(err,null);
                     } else {
                         // Add this key to the set of books
@@ -109,7 +109,7 @@ exports.list_books = function(start, end, callback) {
         var books = new Array();
         if (_.isNull(reply)) {
             if (err) {
-                sys.print('Error: ' + err + "\n");
+                console.log("Error:",err);
             }
             callback(err,books);
             return;

@@ -1,7 +1,6 @@
 // Global registry for our Redis connection.
 // Use this instead of passing around a single 'client' handle.
 // Also allows us to select a database within Redis.
-var sys = require('sys');
 var redis = require("redis");
 var _ = require("underscore");
 
@@ -17,7 +16,7 @@ exports.initClient = function(select_db) {
 
 exports.getClient = function() {
     if (_.isUndefined(client)) {
-        sys.print("Error: client has not been initialized\n");
+        console.log("Error: client has not been initialized");
     }
     return client;
 }

@@ -70,7 +70,7 @@ function User (email, name, password, create, callback) {
         } else if (create) {
             // Create new user from scratch, save in DB
             exports.make_user_id(function(err,result) {
-                if (err) {sys.print("Error: "+err+"\n");callback(err, null);}
+                if (err) {console.log("Error:",err);callback(err, null);}
                 context.id = result;
                 context.email = email;
                 context.id = result;
