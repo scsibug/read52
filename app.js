@@ -10,6 +10,7 @@ var auth = require('connect-auth')
 var form_strategy = require('./form_strategy');
 var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
+var isbn = require('./isbn');
 // Enable cookies/sessions (stored in memory)
 
 app.configure(function() {
@@ -43,7 +44,14 @@ app.get('/register', function(req, res) {
 
 app.post('/register', function(req, res) {
     users.create({email:req.body.email, name:req.body.user, password:req.body.password}, function(err,user) {
-        res.redirect('/',303);
+        req.authenticate(["form"], function(error, authenticated) {
+            if (authenticated) {
+                res.redirect('/user/'+user.id);
+            } else {
+                res.redirect('/',303);
+            }
+
+        });
     });
 });
 
@@ -66,11 +74,7 @@ app.get('/logout', function(req, res) {
 });
 
 var authzUser = function authzUser(req,userid) {
-    console.log(req.isAuthenticated());
-    console.log(sys.inspect(req.getAuthDetails()));
-    console.log(userid);
     var isAuthz = (req.isAuthenticated() && (req.getAuthDetails().user.id == userid));
-    console.log("isAuthz=",isAuthz);
     return isAuthz;
 }
 
@@ -84,22 +88,30 @@ app.get('/user/:id', function(req, res) {
 });
 
 app.get('/user/:id/read/:ean', function (req, res) {
-    res.send("Request for user:"+req.params.id+", EAN:"+req.params.ean);
+    //res.send("Request for user:"+req.params.id+", EAN:"+req.params.ean);
+    res.redirect('/book/'+req.params.ean);
 });
-
-
 
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
     if (authzUser(req,req.params.id)) {
+        var ean = isbn.to_isbn_13(req.body.isbn);
+        if (_.isNull(ean)) {
+            console.log("ISBN/EAN is not valid");
+            res.send("Invalid ISBN",409);
+            return;
+        }
         readings.create(
             {userid: req.params.id,
-             isbn: req.body.isbn,
+             isbn: ean,
              comment: req.body.comment,
              rating: req.body.rating,
              completion_date: req.body.completion_date,
-            },function(err,res) {
-                res.redirect('/user/'+req.params.id+'/read');
+            },function(err,reading) {
+                // Create book, if necessary
+                books.get_book(ean,function(err,book) {
+                    res.redirect('/user/'+req.params.id+'/read/'+ean);
+                });
             });
     } else {
         console.log("Unauthorized POST against user",req.params.id);

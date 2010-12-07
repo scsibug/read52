@@ -40,12 +40,11 @@ exports.Book = function Book (ean,callback) {
     });
 }
 
-// Take a redis client handle, and EAN/ISBN-13 and return book
+// Take an EAN/ISBN-13 and return book
 // structure, querying Amazon and saving into Redis if necessary.
 exports.get_book = function(ean, callback) {
     var client = rclient.getClient();
     // check if we've saved information about this book before.
-
     client.get(exports.key_from_ean(ean), function(err,result) {
         if (err) {
             console.log("Error:",err);
@@ -53,8 +52,8 @@ exports.get_book = function(ean, callback) {
             // book is not in database, need to query AWS and save
             exports.save_book(ean,callback);
         } else {
-            // book exists, just need to query for it
-            exports.query_book(ean,callback);
+            // book exists, just need to instantiate it
+            callback(err,JSON.parse(result));
         }
     });
 }
