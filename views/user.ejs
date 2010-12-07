@@ -1,0 +1,12 @@
+<div class="span-24 last">
+   <h1>User</h1>
+   <% if (userIsHome) { %>
+   <form action="/user/<%= user.id %>/read" method="post">
+   <label>ISBN</label><br />
+   <input type="text" class="title" name="isbn" /> <br />     
+   <input type="submit" value="Submit" /><br />
+   </form>                     
+   <% } %>
+
+</div>
+

@@ -3,6 +3,7 @@ var sys = require('sys');
 var _ = require('underscore');
 var books = require("./books");
 var users = require("./users");
+var readings = require("./readings");
 var rclient = require('./redisclient');
 var client = rclient.initClient();
 var auth = require('connect-auth')
@@ -64,13 +65,45 @@ app.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
+var authzUser = function authzUser(req,userid) {
+    console.log(req.isAuthenticated());
+    console.log(sys.inspect(req.getAuthDetails()));
+    console.log(userid);
+    var isAuthz = (req.isAuthenticated() && (req.getAuthDetails().user.id == userid));
+    console.log("isAuthz=",isAuthz);
+    return isAuthz;
+}
+
 app.get('/user/:id', function(req, res) {
-    if (req.isAuthenticated()) {
-        res.render('user', {
-            locals: {title: "User", user: req.getAuthDetails().user}
-        });
+    res.render('user', {
+        locals: {title: "User",
+                 user: req.getAuthDetails().user,
+                 userIsHome: authzUser(req,req.params.id),
+                }
+    });
+});
+
+app.get('/user/:id/read/:ean', function (req, res) {
+    res.send("Request for user:"+req.params.id+", EAN:"+req.params.ean);
+});
+
+
+
+// Add a book that a user has read
+app.post('/user/:id/read', function (req, res) {
+    if (authzUser(req,req.params.id)) {
+        readings.create(
+            {userid: req.params.id,
+             isbn: req.body.isbn,
+             comment: req.body.comment,
+             rating: req.body.rating,
+             completion_date: req.body.completion_date,
+            },function(err,res) {
+                res.redirect('/user/'+req.params.id+'/read');
+            });
     } else {
-        res.redirect('/login');
+        console.log("Unauthorized POST against user",req.params.id);
+        res.send("Not authorized",401);
     }
 });
 

@@ -89,7 +89,6 @@ exports.create = function(attrs, callback) {
 
 // Create a user object from a set of attributes.
 function User (attrs) {
-    var client = rclient.getClient();
     var context = this;
     context.load_from_json(attrs);
     // new users may have 'password' attribute set, turn this into password_hash/salt attributes.
