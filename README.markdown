@@ -33,5 +33,6 @@ You'll need an Amazon Associate account in order to retrieve book metadata and p
 This application is BSD-3 licensed (see `LICENSE`).
 
 Included in this repository directly in /lib under its own license:
+
 * isbnjs (MIT licensed by hetappi.pm, http://code.google.com/p/isbnjs/)
 
