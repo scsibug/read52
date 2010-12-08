@@ -79,11 +79,17 @@ var authzUser = function authzUser(req,userid) {
 }
 
 app.get('/user/:id', function(req, res) {
-    res.render('user', {
-        locals: {title: "User",
-                 user: req.getAuthDetails().user,
-                 userIsHome: authzUser(req,req.params.id),
-                }
+    readings.readings_for_user(req.params.id,0,52,function(err,readings) {
+        if (err) {
+            res.redirect('/');
+        }
+        res.render('user', {
+            locals: {title: "User",
+                     user: req.getAuthDetails().user,
+                     userIsHome: authzUser(req,req.params.id),
+                     readings: readings,
+                    }
+        });
     });
 });
 

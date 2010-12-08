@@ -4,10 +4,26 @@
 // Store reading at user:4:reading_isbn:ISBN
 
 var _ = require('underscore');
+var sys = require('sys');
 var rclient = require('./redisclient');
+
+var user_reading_set = function(user_id) {
+    return("user:"+user_id+":reading_set");
+}
 
 var key_from_id = function (user_id,ean) {
     return("user:"+user_id+":reading_isbn:"+ean);
+}
+
+// Add (or update) a reading.  read_date argument is standard javascript date (millis since epoch)
+var set_add_reading = function(user_id, read_date, reading_key, callback) {
+    var client = rclient.getClient();
+    client.zadd(user_reading_set(user_id), read_date, reading_key, callback);
+}
+
+var set_remove_reading = function(user_id, reading_key, callback) {
+    var client = rclient.getClient();
+    client.zrem(user_reading_set(user_id), reading_key, callback);
 }
 
 exports.reading_exists = function(user_id,ean,callback) {
@@ -41,7 +57,9 @@ exports.create = function(attrs, callback) {
     exports.reading_exists(attrs.userid,attrs.isbn,function(err,res) {
         if (!err && !res) {
             var reading = new Reading(attrs);
-            reading.save(callback);
+            set_add_reading(attrs.userid,+(attrs.completion_date),attrs.isbn,function (err,res) {
+                reading.save(callback);
+            });
         } else {
             callback("Reading already exists, will not overwrite.", null);
         }
@@ -82,6 +100,36 @@ Reading.prototype.save = function save(callback) {
             callback(err,null);
         } else {
             callback(err,context);
+        }
+    });
+}
+
+exports.readings_for_user = function(userid, start, end, callback) {
+    var client = rclient.getClient();
+    client.zrange(user_reading_set(userid),start,end, function(err,reply){
+        var replies = 0;
+        var readings = new Array();
+
+        if (err) {
+            console.log("Error:",err);
+            callback(err,null);
+            return;
+        }
+        if (_.isNull(reply)) {
+            console.log("user has not read any books");
+            callback(null,readings);
+            return;
+        }
+        for(var i=0; i < reply.length; i++) {
+            var ean = reply[i].toString();
+            var reading_key = key_from_id(userid,ean);
+            exports.get_by_ean(userid,ean,function(err,reading) {
+                readings.push(reading);
+                replies++;
+                if (replies == reply.length) {
+                    callback(err,readings);
+                }
+            });
         }
     });
 }
