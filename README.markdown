@@ -18,7 +18,7 @@ Libraries can be installed with [npm](https://github.com/isaacs/npm#readme).  Ru
 * connect-auth@0.2.1
 * vows@0.5.2
 
-## Redis ## 
+## Redis ##
 Data Storage is through [Redis](http://code.google.com/p/redis/), so you'll need a server installed and available (Only tested with 2.0+).
 
 ## Amazon Associates Account ##
