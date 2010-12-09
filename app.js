@@ -4,6 +4,7 @@ var _ = require('underscore');
 var books = require("./books");
 var users = require("./users");
 var readings = require("./readings");
+var actions = require("./actions");
 var rclient = require('./redisclient');
 var client = rclient.initClient();
 var auth = require('connect-auth')
@@ -11,6 +12,7 @@ var form_strategy = require('./form_strategy');
 var MemoryStore = require('connect/middleware/session/memory');
 var app = express.createServer();
 var isbn = require('./isbn');
+var io = require('socket.io')
 // Enable cookies/sessions (stored in memory)
 
 app.configure(function() {
@@ -25,7 +27,10 @@ app.set('view engine', 'ejs');
 
 // Front page
 app.get('/', function(req, res){
-    res.send('hello world');
+    res.render('index', {
+        locals: { title: "52-in-52" }
+    });
+    actions.publish_action("user loaded /");
 });
 
 // Display login screen
@@ -33,6 +38,7 @@ app.get('/login', function(req, res) {
     res.render('login', {
         locals: { title: "Login" }
     });
+    actions.publish_action("user loaded /login");
 });
 
 // Registration Form
@@ -40,6 +46,7 @@ app.get('/register', function(req, res) {
     res.render('register', {
         locals: { title: "Create New Account" }
     });
+    actions.publish_action("user loaded /register");
 });
 
 app.post('/register', function(req, res) {
@@ -172,3 +179,25 @@ app.post('/book/:id/update', function(req, res) {
 app.use(express.staticProvider(__dirname + '/static'));
 // Start the server
 app.listen(8124);
+
+// Broadcast recent events
+var socket = io.listen(app);
+
+actions.set_listener(function(msg) {
+    socket.broadcast(msg);
+});
+
+
+socket.on('connection', function(client){
+    actions.get_actions(10, function(err,res) {
+        if (err) {
+            console.log("Err: ",err);
+        }
+        console.log("Sending to client",res);
+        sys.print(res);
+        if (_.isArray(res)) {
+            console.log("result is array");
+        }
+        client.send(res.reverse());
+    });
+});

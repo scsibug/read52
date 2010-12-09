@@ -1,0 +1,16 @@
+<script>
+function message(obj){
+  var el = document.createElement('p');
+    el.innerHTML = obj;
+    $('#actions').prepend(el);
+ }
+
+var socket = new io.Socket(null, {port: 8124, rememberTransport: false});
+socket.connect();
+socket.on('message', function(obj){
+    message(obj);
+  });
+</script>
+
+<h1>Recent Actions</h1>
+<div id="actions"></div>
