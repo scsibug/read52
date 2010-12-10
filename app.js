@@ -30,7 +30,6 @@ app.get('/', function(req, res){
     res.render('index', {
         locals: { title: "52-in-52" }
     });
-    actions.publish_action("user loaded /");
 });
 
 // Display login screen
@@ -38,7 +37,6 @@ app.get('/login', function(req, res) {
     res.render('login', {
         locals: { title: "Login" }
     });
-    actions.publish_action("user loaded /login");
 });
 
 // Registration Form
@@ -46,7 +44,6 @@ app.get('/register', function(req, res) {
     res.render('register', {
         locals: { title: "Create New Account" }
     });
-    actions.publish_action("user loaded /register");
 });
 
 app.post('/register', function(req, res) {

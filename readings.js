@@ -20,7 +20,6 @@ var key_from_id = function (user_id,ean) {
 var set_add_reading = function(user_id, read_date, reading_key, callback) {
     var client = rclient.getClient();
     client.zadd(user_reading_set(user_id), read_date, reading_key, callback);
-    actions.publish_action(user_id + " read " + reading_key + " on " + read_date);
 }
 
 var set_remove_reading = function(user_id, reading_key, callback) {
@@ -60,7 +59,10 @@ exports.create = function(attrs, callback) {
         if (!err && !res) {
             var reading = new Reading(attrs);
             set_add_reading(attrs.userid,+(attrs.completion_date),attrs.isbn,function (err,res) {
-                reading.save(callback);
+                reading.save(function (err,res) {
+                    actions.publish_action(attrs.userid,"read " + attrs.isbn + " on " + attrs.completion_date);
+                    callback(err,res);
+                });
             });
         } else {
             callback("Reading already exists, will not overwrite.", null);
