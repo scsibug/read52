@@ -141,7 +141,7 @@ app.get('/private', function(req, res) {
 app.get('/book', function(req, res){
     books.list_books(0,100, function(err, booklist) {
         res.render('books', {
-            locals: { books: booklist, title: "book list" }
+            locals: { books: booklist, title: "Book List" }
         });       
     });
 });
@@ -150,7 +150,7 @@ app.get('/book', function(req, res){
 app.get('/book/:id', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
         res.render('book', {
-            locals: { title: b.title, book: b }
+            locals: { title: ("Info for "+b.title), book: b }
         });
     });
 });
