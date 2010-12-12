@@ -1,11 +1,11 @@
 <script>
 function message(obj){
-  var el = $("<p />").hide().text(obj);
+  var el = $("<span class='action' />").hide().text(obj);
   $('#actions').prepend(el);
   el.fadeIn();
   var actions = $('#actions p').length;
   if (actions > 10) {
-    $('#actions p:last').remove();
+    $('#actions span:last').remove();
   }
  }
 
@@ -16,5 +16,19 @@ socket.on('message', function(obj){
   });
 </script>
 
-<h1>Recent Actions</h1>
-<div id="actions"></div>
+<div id="subheader" class="span-24 last">
+  <h3 class="alt">Read 52 Books in 52 Weeks.</h3>
+</div>
+
+<hr />
+<div id="main" class="span-17 colborder">
+  <p>
+    
+  </p>
+</div>
+<div class="span-6 last">
+  <h2 class="caps">Recent Actions...</h2>
+  <div id="actions" class="span-6 last" />
+</div>
+
+

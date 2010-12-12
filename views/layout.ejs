@@ -3,18 +3,31 @@
   <head>
     <title>Info for <%= title %></title>
     <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection" />
-  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="/css/blueprint/plugins/fancy-type/screen.css" type="text/css" media="screen, projection" /> 
   <!--[if lt IE 8]>
       <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection" />
       <![endif]-->
-<!--  <link rel="stylesheet" href="/css/52-in-52.css" type="text/css" media="screen, projection">-->
-<!-- JQuery and plugins -->
+  <link rel="stylesheet" href="/css/52-in-52.css" type="text/css" media="screen, projection">
+  <!-- JQuery and plugins -->
   <script src="js/jquery-1.4.3.min.js"></script>
   <script src="http://cdn.socket.io/stable/socket.io.js"></script>
   </head>
   <body>
     <div class="container">
+
+      <div id="header" class="span-16">
+        <h1>52-in-52</h1>
+      </div>
+
+      <div id="nav" class="span-8 last"> 
+        <ul>
+          <!-- <li><a href="/" title="Welcome!">Home</a></li> --> 
+          <li><a href="/" title="Home">Home</a></li> 
+          <li><a href="/login" title="Sign In">Sign In</a></li> 
+        </ul> 
+      </div>
+      <hr />
       <%- body %>
-    </div>
   </body>
 </html>
