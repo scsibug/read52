@@ -9,7 +9,8 @@ var rclient = require('./redisclient');
 var client = rclient.initClient();
 var auth = require('connect-auth')
 var form_strategy = require('./form_strategy');
-var MemoryStore = require('connect/middleware/session/memory');
+//var MemoryStore = require('connect/middleware/session/memory');
+var RedisStore = require('./connect_redis');
 var app = express.createServer();
 var isbn = require('./isbn');
 var io = require('socket.io')
@@ -18,7 +19,8 @@ var io = require('socket.io')
 app.configure(function() {
     app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
-    app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
+    app.use(express.session({ store: new RedisStore({ maxAge: 60000 * 60 * 24 * 30 })}));
+//    app.use(express.session({ store: new MemoryStore({ reapInterval: 60000 * 60 })}));
     app.use(auth(form_strategy()));
 });
 
