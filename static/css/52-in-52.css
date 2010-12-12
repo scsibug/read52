@@ -33,3 +33,25 @@ body
 { 
   background: #ccf;
 }
+
+#nav ul
+{
+  float: right;
+  margin-top: 5px;
+}
+
+#nav ul li
+{
+  display: inline;
+  float: left;
+  margin: 5px 0px 0x 0x;
+}
+
+#nav ul li a
+{
+  background: #555;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
