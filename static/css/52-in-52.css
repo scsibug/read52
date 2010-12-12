@@ -43,22 +43,24 @@ p.elab
 #nav ul
 {
   float: right;
-  margin-top: 5px;
+  margin-top: 0px;
 }
 
 #nav ul li
 {
   display: inline;
   float: left;
-  margin: 5px 0px 0x 0x;
+  margin: 0px 0px 0x 0x;
+  background: #555;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #nav ul li a
 {
   background: #555;
   color: white;
-  padding: 10px;
-  font-weight: bold;
-  text-decoration: none;
 }
 /*******************************/

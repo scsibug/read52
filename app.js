@@ -28,21 +28,21 @@ app.set('view engine', 'ejs');
 // Front page
 app.get('/', function(req, res){
     res.render('index', {
-        locals: { title: "52-in-52" }
+        locals: { title: "52-in-52", nav: "home" }
     });
 });
 
 // Display login screen
 app.get('/login', function(req, res) {
     res.render('login', {
-        locals: { title: "Login" }
+        locals: { title: "Login", nav: "login" }
     });
 });
 
 // Registration Form
 app.get('/register', function(req, res) {
     res.render('register', {
-        locals: { title: "Create New Account" }
+        locals: { title: "Create New Account", nav: "login" }
     });
 });
 
@@ -88,7 +88,7 @@ app.get('/user/:id', function(req, res) {
             res.redirect('/');
         }
         res.render('user', {
-            locals: {title: "User",
+            locals: {title: "User", nav: "user",
                      user: req.getAuthDetails().user,
                      userIsHome: authzUser(req,req.params.id),
                      readings: readings,
@@ -141,7 +141,7 @@ app.get('/private', function(req, res) {
 app.get('/book', function(req, res){
     books.list_books(0,100, function(err, booklist) {
         res.render('books', {
-            locals: { books: booklist, title: "Book List" }
+            locals: { books: booklist, title: "Book List", nav: "books" }
         });       
     });
 });
@@ -150,7 +150,7 @@ app.get('/book', function(req, res){
 app.get('/book/:id', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
         res.render('book', {
-            locals: { title: ("Info for "+b.title), book: b }
+            locals: { title: ("Info for "+b.title), book: b, nav: "books" }
         });
     });
 });

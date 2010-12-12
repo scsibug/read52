@@ -16,14 +16,35 @@
   <body>
     <div class="container">
 
-      <div id="header" class="span-16">
+      <div id="header" class="span-8">
         <h1>52-in-52</h1>
       </div>
 
-      <div id="nav" class="span-8 last"> 
+      <div id="nav" class="span-16 last"> 
         <ul>
+          <% if (nav=="home") { %>
+          <li>Home</li> 
+          <% } else { %>
           <li><a href="/" title="Home">Home</a></li> 
+          <% } %>
+
+          <% if (nav=="login") { %>
+          <li>Login</li> 
+          <% } else { %>
           <li><a href="/login" title="Sign In">Sign In</a></li> 
+          <% } %>
+
+          <% if (nav=="user") { %>
+          <li>Your Account</li> 
+          <% } else { %>
+          <li><a href="/user" title="Your Account">Your Account</a></li> 
+          <% } %>
+
+          <% if (nav=="books") { %>
+          <li>Books</li> 
+          <% } else { %>
+          <li><a href="/book" title="Books">Books</a></li> 
+          <% } %>
         </ul> 
       </div>
       <hr />
