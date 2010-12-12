@@ -28,22 +28,25 @@
           <li><a href="/" title="Home">Home</a></li> 
           <% } %>
 
-          <% if (nav=="login") { %>
-          <li>Login</li> 
-          <% } else { %>
-          <li><a href="/login" title="Sign In">Sign In</a></li> 
-          <% } %>
-
-          <% if (nav=="user") { %>
-          <li>Your Account</li> 
-          <% } else { %>
-          <li><a href="/user" title="Your Account">Your Account</a></li> 
-          <% } %>
-
           <% if (nav=="books") { %>
           <li>Books</li> 
           <% } else { %>
           <li><a href="/book" title="Books">Books</a></li> 
+          <% } %>
+
+          <% if (user == null) { %>
+            <% if (nav=="login") { %>
+            <li>Login</li> 
+            <% } else { %>
+            <li><a href="/login" title="Sign In">Sign In</a></li> 
+            <% } %>
+          <% } else { %>
+            <% if (nav=="user") { %>
+              <li>Your Account</li> 
+            <% } else { %>
+              <li><a href="/user/<%= user.id %>" title="Your Account">Your Account</a></li> 
+            <% } %>
+              <li><a href="/logout" title="Logout">Logout</a></li> 
           <% } %>
         </ul> 
       </div>

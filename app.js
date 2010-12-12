@@ -27,24 +27,39 @@ app.configure(function() {
 // EJS is our default templating system
 app.set('view engine', 'ejs');
 
+// Check if a userid matches the current authenticated user
+var authzUser = function authzUser(req,userid) {
+    var isAuthz = (req.isAuthenticated() && (req.getAuthDetails().user.id == userid));
+    return isAuthz;
+}
+
 // Front page
 app.get('/', function(req, res){
     res.render('index', {
-        locals: { title: "52-in-52", nav: "home" }
+        locals: { title: "52-in-52",
+                  nav: "home",
+                  user: req.getAuthDetails().user
+                }
     });
 });
 
 // Display login screen
 app.get('/login', function(req, res) {
     res.render('login', {
-        locals: { title: "Login", nav: "login" }
+        locals: { title: "Login",
+                  nav: "login",
+                  user: req.getAuthDetails().user
+                }
     });
 });
 
 // Registration Form
 app.get('/register', function(req, res) {
     res.render('register', {
-        locals: { title: "Create New Account", nav: "login" }
+        locals: { title: "Create New Account",
+                  nav: "login",
+                  user: req.getAuthDetails().user
+                }
     });
 });
 
@@ -79,18 +94,14 @@ app.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
-var authzUser = function authzUser(req,userid) {
-    var isAuthz = (req.isAuthenticated() && (req.getAuthDetails().user.id == userid));
-    return isAuthz;
-}
-
 app.get('/user/:id', function(req, res) {
     readings.readings_for_user(req.params.id,0,52,function(err,readings) {
         if (err) {
             res.redirect('/');
         }
         res.render('user', {
-            locals: {title: "User", nav: "user",
+            locals: {title: "User",
+                     nav: "user",
                      user: req.getAuthDetails().user,
                      userIsHome: authzUser(req,req.params.id),
                      readings: readings,
@@ -143,7 +154,11 @@ app.get('/private', function(req, res) {
 app.get('/book', function(req, res){
     books.list_books(0,100, function(err, booklist) {
         res.render('books', {
-            locals: { books: booklist, title: "Book List", nav: "books" }
+            locals: { books: booklist,
+                      title: "Book List",
+                      nav: "books",
+                      user: req.getAuthDetails().user
+                    }
         });       
     });
 });
@@ -152,7 +167,11 @@ app.get('/book', function(req, res){
 app.get('/book/:id', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
         res.render('book', {
-            locals: { title: ("Info for "+b.title), book: b, nav: "books" }
+            locals: { title: ("Info for "+b.title),
+                      book: b,
+                      nav: "books",
+                      user: req.getAuthDetails().user
+                    }
         });
     });
 });
