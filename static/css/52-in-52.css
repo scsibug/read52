@@ -34,6 +34,12 @@ body
   background: #ccf;
 }
 
+p.elab
+{ 
+  font-size: 1.5em;
+}
+
+/****  Navigation Menu *****/
 #nav ul
 {
   float: right;
@@ -55,3 +61,4 @@ body
   font-weight: bold;
   text-decoration: none;
 }
+/*******************************/
