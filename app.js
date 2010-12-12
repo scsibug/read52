@@ -211,11 +211,6 @@ socket.on('connection', function(client){
         if (err) {
             console.log("Err: ",err);
         }
-        console.log("Sending to client",res);
-        sys.print(res);
-        if (_.isArray(res)) {
-            console.log("result is array");
-        }
         client.send(res.reverse());
     });
 });
