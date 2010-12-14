@@ -64,7 +64,7 @@ exports.get_by_id = function(id, callback) {
 //  users.create({name="foo", email="foo@bar.com", name="Foo Bar", password="fb"},callback)
 exports.create = function(attrs, callback) {
    if (!_.isDate(attrs.creation_date)) {
-        attrs.creation_date = new Date();
+        attrs.creation_date = +new Date();
     }
     // Attempt to find an existing account ID with the same email.
     exports.key_from_email(attrs.email,function(err,result) {

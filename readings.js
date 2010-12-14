@@ -52,10 +52,10 @@ exports.reading_exists = function(user_id,ean,callback) {
 exports.create = function(attrs, callback) {
     var client = rclient.getClient();
     if (!_.isDate(attrs.creation_date)) {
-        attrs.creation_date = new Date();
+        attrs.creation_date = +new Date();
     }
     if (!_.isDate(attrs.completion_date)) {
-        attrs.completion_date = new Date();
+        attrs.completion_date = +new Date();
     }
     var reading_id = key_from_id(attrs.userid,attrs.isbn);
     // Ensure there isn't an existing reading for this user/ISBN combination
