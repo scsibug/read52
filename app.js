@@ -176,10 +176,22 @@ app.get('/book/:id', function(req, res) {
     });
 });
 
-// Show raw AMZ information
-app.get('/book/:id/amz', function(req, res) {
+// Raw book information (mostly for debugging at the moment)
+app.get('/book/:id/:key', function(req, res) {
     new books.Book(req.params.id, function(err,b) {
-        res.send(b.raw);
+        var content = b[req.params.key];
+        if (!_.isUndefined(content) && !_.isNull(content)) {
+            console.log("content is",content);
+            // redirect image URLs
+            if (req.params.key.substr(0,"amz_img_".length) == "amz_img_") {
+                console.log("Sending redirect to image",content);
+                res.redirect(content,303);
+                return;
+            }
+            res.send(b[req.params.key].toString());
+        } else {
+            res.send("Key "+req.params.key+" does not exist", 404);
+        }
     });
 });
 
