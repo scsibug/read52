@@ -75,7 +75,17 @@ exports.create = function(attrs, callback) {
 
 exports.get_by_ean = function(userid, ean, callback) {
     var client = rclient.getClient();
-    client.get(key_from_id(userid,ean),function(err,res) {
+    var rkey = key_from_id(userid,ean)
+    client.get(rkey,function(err,res) {
+        if (err) {
+            console.log("Error: ",err)
+            callback(err,null);
+            return;
+        } else if (_.isNull(res) || _.isUndefined(res)) {
+            console.log("No value for",rkey);
+            callback("Reading does not exist",null);
+            return;
+        }
         var json = JSON.parse(res);
         var reading = new Reading(json);
         callback(err,reading);
@@ -109,6 +119,16 @@ Reading.prototype.save = function save(callback) {
     });
 }
 
+Reading.prototype.toJSON = function() {
+    var json = new Object;
+    var context = this;
+    _.select(reading_keys, function (key) {
+        json[key] = context[key];
+    });
+    return json;
+}
+
+// Produce an array of {reading,book} pairs
 exports.readings_for_user = function(userid, start, end, callback) {
     var client = rclient.getClient();
     client.zrange(user_reading_set(userid),start,end, function(err,reply){
@@ -129,7 +149,11 @@ exports.readings_for_user = function(userid, start, end, callback) {
             var ean = reply[i].toString();
             var reading_key = key_from_id(userid,ean);
             exports.get_by_ean(userid,ean,function(err,reading) {
-                readings.push(reading);
+                if (err) {
+                    console.log("Error loading reading, userid:",userid," ean:",ean);
+                } else {
+                    readings.push(reading);
+                }
                 replies++;
                 if (replies == reply.length) {
                     callback(err,readings);
