@@ -7,6 +7,7 @@ var _ = require('underscore');
 var sys = require('sys');
 var rclient = require('./redisclient');
 var actions = require('./actions');
+var books = require('./books');
 
 // Keys that are specific to a reading object, that should be serialized/deserialized
 var reading_keys = ["userid", "isbn", "comment", "rating", "completion_date", "creation_date"];
@@ -75,7 +76,7 @@ exports.create = function(attrs, callback) {
 
 exports.get_by_ean = function(userid, ean, callback) {
     var client = rclient.getClient();
-    var rkey = key_from_id(userid,ean)
+    var rkey = key_from_id(userid,ean);
     client.get(rkey,function(err,res) {
         if (err) {
             console.log("Error: ",err)
@@ -88,7 +89,10 @@ exports.get_by_ean = function(userid, ean, callback) {
         }
         var json = JSON.parse(res);
         var reading = new Reading(json);
-        callback(err,reading);
+        new books.Book(ean,function(err,book) {
+            reading.book = book;
+            callback(err,reading);
+        });
     });
 }
 
@@ -128,7 +132,6 @@ Reading.prototype.toJSON = function() {
     return json;
 }
 
-// Produce an array of {reading,book} pairs
 exports.readings_for_user = function(userid, start, end, callback) {
     var client = rclient.getClient();
     client.zrange(user_reading_set(userid),start,end, function(err,reply){
