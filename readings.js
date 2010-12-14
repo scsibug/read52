@@ -8,6 +8,9 @@ var sys = require('sys');
 var rclient = require('./redisclient');
 var actions = require('./actions');
 
+// Keys that are specific to a reading object, that should be serialized/deserialized
+var reading_keys = ["userid", "isbn", "comment", "rating", "completion_date", "creation_date"];
+
 var user_reading_set = function(user_id) {
     return("user:"+user_id+":reading_set");
 }
@@ -87,12 +90,10 @@ function Reading (attrs) {
 }
 
 Reading.prototype.load_from_json = function(json) {
-    this.userid = json.userid;
-    this.isbn = json.isbn;
-    this.comment = json.comment;
-    this.rating = json.rating;
-    this.completion_date = json.completion_date;
-    this.creation_date = json.creation_date;
+    var context = this;
+    _.select(reading_keys, function (key) {
+        context[key] = json[key];
+    });
 }
 
 Reading.prototype.save = function save(callback) {
