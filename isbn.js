@@ -6,5 +6,5 @@ var _ = require("underscore");
 exports.to_isbn_13 = function (isbn) {
     isbn = isbn.replace(/-/g,"");
     if (_.isNull(isbn) || _.isUndefined(isbn)) { return null; }
-    return isbnlib.ISBN.asIsbn13(isbn,false)
-}
+    return isbnlib.ISBN.asIsbn13(isbn,false);
+};
