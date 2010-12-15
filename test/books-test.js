@@ -42,7 +42,7 @@ vows.describe('Books').addBatch({
         },
         'has Amazon details page': function(err, book) {
             assert.isString(book.amz_detail_url);
-        },
+        }
     }
 }).addBatch({
     'Key/EAN conversion': {
@@ -66,7 +66,7 @@ vows.describe('Books').addBatch({
         'No books returns array': function(err,booklist) {
             assert.isTrue(_.isArray(booklist));
             assert.equal(booklist.length,0);
-        },
+        }
     }
 }).addBatch({
     'Book Listing': {
@@ -74,11 +74,11 @@ vows.describe('Books').addBatch({
             var context = this;
             // flush db, add two books, and get a full list.
             client.flushdb(function() {
-                new books.Book("9780060733353",function(err,b) {
-                    new books.Book("9780471292524",function(err,book) {
+                (new books.Book("9780060733353",function(err,b) {
+                    (new books.Book("9780471292524",function(err,book) {
                         books.list_books(0,99,context.callback);
-                    });
-                });
+                    }));
+                }));
             });
         },
         'returns Books': function(err,booklist) {

@@ -13,14 +13,14 @@ vows.describe('ISBN').addBatch({
                 "0316005401" : "9780316005401",
                 "031600538X" : "9780316005388",
                 "0446537519" : "9780446537513",
-                "0760757615" : "9780760757611",
+                "0760757615" : "9780760757611"
                    };
         },
         'convert to ISBN-13': function(isbns) {
             _.each(isbns, function(isbn_13,isbn_10) {
                 assert.equal(isbn_13, isbn.to_isbn_13(isbn_10));
             });
-        },
+        }
     },
     'Cleanup': {
         topic: function() {
@@ -36,14 +36,14 @@ vows.describe('ISBN').addBatch({
                 "978-0-316005-40-1" : "9780316005401",
                 "978-0-316005-38-8" : "9780316005388",
                 "978-0-446537-51-3" : "9780446537513",
-                "978-0-760757-61-1" : "9780760757611",
+                "978-0-760757-61-1" : "9780760757611"
                    };
         },
         'cleanup dashes/spaces': function(isbns) {
             _.each(isbns, function(clean,dirty) {
                 assert.equal(clean, isbn.to_isbn_13(dirty));
             });
-        },
+        }
     },
     'Invalid': {
         'handle empty': function() {
@@ -69,7 +69,6 @@ vows.describe('ISBN').addBatch({
         'handle invalid alpha': function() {
             assert.isNull(isbn.to_isbn_13("978A060733353"));
             assert.isNull(isbn.to_isbn_13("006C733357"));
-        },
+        }
     }
 }).export(module);
-

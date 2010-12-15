@@ -7,7 +7,7 @@ require('underscore');
 vows.describe('Passwords').addBatch({
     'Salt creation': {
         topic: function() {
-            return pw.create_salt()
+            return pw.create_salt();
         },
         'salts are unique': function(salt) {
             setTimeout(function() {

@@ -11,9 +11,9 @@ vows.describe('Users').addBatch({
         topic: function() {
             var context = this;
             client.flushdb(function() {
-                new users.create({email:"scsibug@imap.cc",name:"Greg",password:"123"},function(err,res) {
+                (new users.create({email:"scsibug@imap.cc",name:"Greg",password:"123"},function(err,res) {
                     context.callback(err,res);
-                });
+                }));
             });
         },
         'has ID': function(err, user) {
@@ -32,9 +32,9 @@ vows.describe('Users').addBatch({
         'and a second user': {
             topic: function(user1) {
                 var context = this;
-                new users.create({email:"user@example.com",name:"user",password:"123"},function(err,user2) {
+                (new users.create({email:"user@example.com",name:"user",password:"123"},function(err,user2) {
                     context.callback(err, user1, user2);
-                });
+                }));
             },
             'has different email': function(err,user1,user2) {
                 assert.notEqual(user1.email,user2.email);
@@ -84,7 +84,7 @@ vows.describe('Users').addBatch({
                 },
                 'password matches': function(err,res) {
                     assert.isTrue(res);
-                },
+                }
             }
         }
     }
