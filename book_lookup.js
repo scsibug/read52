@@ -7,7 +7,7 @@ var aws_credentials = require('./aws_cred');
 opHelper = new OperationHelper({
     awsId:     aws_credentials.awsId,
     awsSecret: aws_credentials.awsSecret,
-    assocId:   aws_credentials.assocId,
+    assocId:   aws_credentials.assocId
 });
 
 // Lookup a book by ISBN-13, and get product information from AWS
@@ -16,7 +16,7 @@ isbn_lookup_unthrottled = function(isbn_dirty, callback) {
     if (_.isNull(isbn_dirty)) {
         callback("Null ISBN", null);
     }
-    var isbn = isbnlib.to_isbn_13(isbn_dirty)
+    var isbn = isbnlib.to_isbn_13(isbn_dirty);
     if (_.isNull(isbn)) {
         console.log("Provided ISBN could not be parsed:",isbn);
     }
@@ -39,7 +39,7 @@ isbn_lookup_unthrottled = function(isbn_dirty, callback) {
             callback(error, results.Items.Item);
         }
     });
-}
+};
 
 // Amazon prefers 1 second between calls, or 503 errors become likely.
 exports.isbn_lookup = _.throttle(isbn_lookup_unthrottled, 1100);

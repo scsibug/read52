@@ -9,7 +9,7 @@ module.exports= function(options) {
     that.name     = options.name || "form";
     var send_to_login = function(response) {
         response.redirect('/login',303);
-    }
+    };
     that.authenticate= function(request, response, callback) {
         var context = this;
         var email = request.body.email;
@@ -30,6 +30,6 @@ module.exports= function(options) {
                 });
             }
         });
-    }
+    };
     return that;
 };

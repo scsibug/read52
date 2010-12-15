@@ -7,12 +7,12 @@ var readings = require("./readings");
 var actions = require("./actions");
 var rclient = require('./redisclient');
 var client = rclient.initClient();
-var auth = require('connect-auth')
+var auth = require('connect-auth');
 var form_strategy = require('./form_strategy');
 var RedisStore = require('./connect_redis');
 var app = express.createServer();
 var isbn = require('./isbn');
-var io = require('socket.io')
+var io = require('socket.io');
 
 app.configure(function() {
     app.use(express.bodyDecoder());
@@ -28,7 +28,7 @@ app.set('view engine', 'ejs');
 var authzUser = function authzUser(req,userid) {
     var isAuthz = (req.isAuthenticated() && (req.getAuthDetails().user.id == userid));
     return isAuthz;
-}
+};
 
 // Front page
 app.get('/', function(req, res){
@@ -57,7 +57,7 @@ app.get('/register', function(req, res) {
         locals: { title: "Create New Account",
                   nav: "login",
                   user: req.getAuthDetails().user,
-                  flash: flash,
+                  flash: flash
                 }
     });
 });
@@ -120,7 +120,7 @@ app.get('/user/:id', function(req, res) {
                          nav: "user",
                          user: req.getAuthDetails().user,
                          userIsHome: authzUser(req,req.params.id),
-                         readings: readings,
+                         readings: readings
                         }
             });
         });
@@ -146,7 +146,7 @@ app.post('/user/:id/read', function (req, res) {
              isbn: ean,
              comment: req.body.comment,
              rating: req.body.rating,
-             completion_date: req.body.completion_date,
+             completion_date: req.body.completion_date
             },function(err,reading) {
                 // Create book, if necessary
                 books.get_book(ean,function(err,book) {
@@ -182,7 +182,7 @@ app.get('/book', function(req, res){
 
 // Get book information from amazon
 app.get('/book/:id', function(req, res) {
-    new books.Book(req.params.id, function(err,b) {
+    (new books.Book(req.params.id, function(err,b) {
         res.render('book', {
             locals: { title: ("Info for "+b.title),
                       book: b,
@@ -190,12 +190,12 @@ app.get('/book/:id', function(req, res) {
                       user: req.getAuthDetails().user
                     }
         });
-    });
+    }));
 });
 
 // Raw book information (mostly for debugging at the moment)
 app.get('/book/:id/:key', function(req, res) {
-    new books.Book(req.params.id, function(err,b) {
+    (new books.Book(req.params.id, function(err,b) {
         var content = b[req.params.key];
         if (!_.isUndefined(content) && !_.isNull(content)) {
             console.log("content is",content);
@@ -209,16 +209,16 @@ app.get('/book/:id/:key', function(req, res) {
         } else {
             res.send("Key "+req.params.key+" does not exist", 404);
         }
-    });
+    }));
 });
 
 // Force an update of book metadata... mostly useful for debugging
 app.post('/book/:id/update', function(req, res) {
     console.log("Forcing an update of ",req.params.id," via AWS");
     books.save_book(req.params.id,function() {
-        new books.Book(req.params.id, function(err,b) {
+        (new books.Book(req.params.id, function(err,b) {
             res.redirect('/book/'+b.ean, 200);
-        });
+        }));
     });
 });
 

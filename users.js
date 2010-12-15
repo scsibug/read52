@@ -6,43 +6,43 @@ var _ = require('underscore');
 // We store users by a unique numeric ID.
 // We also maintain a mapping of email addresses -> ID's
 
-const user_incr = "user_incr";
-const user_prefix = "user:";
-const user_mail_prefix = "user_email:";
+var user_incr = "user_incr";
+var user_prefix = "user:";
+var user_mail_prefix = "user_email:";
+
+// Form the key used for looking up a userID from an email.
+// Performing a GET on the result returns the ID of the user.
+var email_key = function(email) {
+    return user_mail_prefix+email;
+};
 
 // Get user key from email
 exports.key_from_email = function (email,callback) {
     var client = rclient.getClient();
     client.get(email_key(email),callback);
-}
+};
 
 // Create email -> ID mapping
 var set_email_key = function(email, user_id, callback) {
     var client = rclient.getClient();
     // use setnx to prevent emails from overwriting others.
     client.setnx(email_key(email),user_id,callback);
-}
-
-// Form the key used for looking up a userID from an email.
-// Performing a GET on the result returns the ID of the user.
-var email_key = function(email) {
-    return user_mail_prefix+email;
-}
+};
 
 var key_from_id = function (id) {
     return (user_prefix+id+":info");
-}
+};
 
 // Create a new unique user ID
 var make_user_id = function(callback) {
     var client = rclient.getClient();
     client.incr(user_incr,callback);
-}
+};
 
 exports.user_id_exists = function(id, callback) {
     var client = rclient.getClient();
     client.exists(key_from_id(id),callback);
-}
+};
 
 exports.get_by_email = function(email, callback) {
     // Map email to user ID
@@ -53,6 +53,18 @@ exports.get_by_email = function(email, callback) {
             exports.get_by_id(result,callback);
         }
     });
+};
+
+// Create a user object from a set of attributes.
+function User (attrs) {
+    var context = this;
+    context.load_from_json(attrs);
+    // new users may have 'password' attribute set, turn this into password_hash/salt attributes.
+    if (_.isString(attrs.password)) {
+        context.setPassword(attrs.password);
+        attrs.password = undefined; //forget password
+    }
+    return context;
 }
 
 exports.get_by_id = function(id, callback) {
@@ -63,7 +75,7 @@ exports.get_by_id = function(id, callback) {
         var user = new User(json);
         callback(err,user);
     });
-}
+};
 
 // Creating new user
 //  users.create({name="foo", email="foo@bar.com", name="Foo Bar", password="fb"},callback)
@@ -90,19 +102,7 @@ exports.create = function(attrs, callback) {
             callback("User with email already exists",null);
         }
     });
-}
-
-// Create a user object from a set of attributes.
-function User (attrs) {
-    var context = this;
-    context.load_from_json(attrs);
-    // new users may have 'password' attribute set, turn this into password_hash/salt attributes.
-    if (_.isString(attrs.password)) {
-        context.setPassword(attrs.password);
-        attrs.password = undefined; //forget password
-    }
-    return context;
-}
+};
 
 User.prototype.load_from_json = function(json) {
     this.id = json.id;
@@ -111,7 +111,7 @@ User.prototype.load_from_json = function(json) {
     this.creation_date = json.creation_date;
     this.password_hash = json.password_hash;
     this.salt = json.salt;
-}
+};
 
 User.prototype.save = function save(callback) {
     var client = rclient.getClient();
@@ -124,7 +124,7 @@ User.prototype.save = function save(callback) {
             return context;
         });
     });
-}
+};
 
 // Set user password and update salt/hash.
 User.prototype.setPassword = function setPassword(pass) {

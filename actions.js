@@ -28,15 +28,15 @@ exports.publish_action = function(user_id, action, callback) {
             });
         }
     });
-}
+};
 
 exports.get_actions = function(count, callback) {
     var client = rclient.getClient();
     client.lrange(global_action_list, 0, count, function(err,res) {
         callback(err,res);
     });
-}
+};
 
 exports.set_listener = function(callback) {
     listener = callback;
-}
+};

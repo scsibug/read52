@@ -14,22 +14,22 @@ var reading_keys = ["userid", "isbn", "comment", "rating", "completion_date", "c
 
 var user_reading_set = function(user_id) {
     return("user:"+user_id+":reading_set");
-}
+};
 
 var key_from_id = function (user_id,ean) {
     return("user:"+user_id+":reading_isbn:"+ean);
-}
+};
 
 // Add (or update) a reading.  read_date argument is standard javascript date (millis since epoch)
 var set_add_reading = function(user_id, read_date, reading_key, callback) {
     var client = rclient.getClient();
     client.zadd(user_reading_set(user_id), read_date, reading_key, callback);
-}
+};
 
 var set_remove_reading = function(user_id, reading_key, callback) {
     var client = rclient.getClient();
     client.zrem(user_reading_set(user_id), reading_key, callback);
-}
+};
 
 exports.reading_exists = function(user_id,ean,callback) {
     var client = rclient.getClient();
@@ -46,6 +46,13 @@ exports.reading_exists = function(user_id,ean,callback) {
             callback(null,false);
         }
     });
+};
+
+// Create a reading object from a set of attributes.
+function Reading (attrs) {
+    var context = this;
+    context.load_from_json(attrs);
+    return context;
 }
 
 // Creating a reading should save the reading itself, and associate it with a user.
@@ -72,14 +79,14 @@ exports.create = function(attrs, callback) {
             callback("Reading already exists, will not overwrite.", null);
         }
     });
-}
+};
 
 exports.get_by_ean = function(userid, ean, callback) {
     var client = rclient.getClient();
     var rkey = key_from_id(userid,ean);
     client.get(rkey,function(err,res) {
         if (err) {
-            console.log("Error: ",err)
+            console.log("Error: ",err);
             callback(err,null);
             return;
         } else if (_.isNull(res) || _.isUndefined(res)) {
@@ -89,26 +96,19 @@ exports.get_by_ean = function(userid, ean, callback) {
         }
         var json = JSON.parse(res);
         var reading = new Reading(json);
-        new books.Book(ean,function(err,book) {
+        (new books.Book(ean,function(err,book) {
             reading.book = book;
             callback(err,reading);
-        });
+        }));
     });
-}
-
-// Create a reading object from a set of attributes.
-function Reading (attrs) {
-    var context = this;
-    context.load_from_json(attrs);
-    return context;
-}
+};
 
 Reading.prototype.load_from_json = function(json) {
     var context = this;
     _.select(reading_keys, function (key) {
         context[key] = json[key];
     });
-}
+};
 
 Reading.prototype.save = function save(callback) {
     var client = rclient.getClient();
@@ -121,22 +121,22 @@ Reading.prototype.save = function save(callback) {
             callback(err,context);
         }
     });
-}
+};
 
 Reading.prototype.toJSON = function() {
-    var json = new Object;
+    var json = {};
     var context = this;
     _.select(reading_keys, function (key) {
         json[key] = context[key];
     });
     return json;
-}
+};
 
 exports.readings_for_user = function(userid, start, end, callback) {
     var client = rclient.getClient();
     client.zrange(user_reading_set(userid),start,end, function(err,reply){
         var replies = 0;
-        var readings = new Array();
+        var readings = [];
 
         if (err) {
             console.log("Error:",err);
@@ -164,6 +164,6 @@ exports.readings_for_user = function(userid, start, end, callback) {
             });
         }
     });
-}
+};
 
 exports.Reading = Reading;
