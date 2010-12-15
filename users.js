@@ -39,6 +39,11 @@ var make_user_id = function(callback) {
     client.incr(user_incr,callback);
 }
 
+exports.user_id_exists = function(id, callback) {
+    var client = rclient.getClient();
+    client.exists(key_from_id(id),callback);
+}
+
 exports.get_by_email = function(email, callback) {
     // Map email to user ID
     exports.key_from_email(email,function(err,result) {
