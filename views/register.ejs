@@ -3,6 +3,12 @@
    <h3>(or <a href="/login">login</a>)</h3>
 </div>
 
+<% if (flash.error) { %>
+<div class="span-24 last error">
+  <%= flash.error %>
+</div>
+<% } %>
+
 <div class="span-24 last">
    <form name="register" action="/register" method="post">
    <label>Email</label><br />

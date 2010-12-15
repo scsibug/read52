@@ -52,23 +52,37 @@ app.get('/login', function(req, res) {
 
 // Registration Form
 app.get('/register', function(req, res) {
+    var flash = req.flash();
     res.render('register', {
         locals: { title: "Create New Account",
                   nav: "login",
-                  user: req.getAuthDetails().user
+                  user: req.getAuthDetails().user,
+                  flash: flash,
                 }
     });
 });
 
 app.post('/register', function(req, res) {
+    if (_.isNull(req.body.password) || req.body.password == "") {
+        req.flash('error', 'You must enter a password');
+        res.redirect('/register');
+        return;
+    }
+    if (req.body.password !== req.body.verify_password) {
+        req.flash('error', 'Passwords must match');
+        res.redirect('/register');
+        return;
+    }
     users.create({email:req.body.email, name:req.body.user, password:req.body.password}, function(err,user) {
+        if (err) {
+            req.flash('error', err);
+            return;
+        }
+        // User can now be authenticated and directed to their user page.
         req.authenticate(["form"], function(error, authenticated) {
             if (authenticated) {
                 res.redirect('/user/'+user.id);
-            } else {
-                res.redirect('/',303);
             }
-
         });
     });
 });
