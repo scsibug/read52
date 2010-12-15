@@ -1,8 +1,6 @@
 // Module to manage readings, instances of a book being read.
 // Readings essentially consist of a book, start/finish date, rating, and comments.
 
-// Store reading at user:4:reading_isbn:ISBN
-
 var _ = require('underscore');
 var sys = require('sys');
 var rclient = require('./redisclient');
@@ -132,16 +130,48 @@ Reading.prototype.toJSON = function() {
     return json;
 };
 
+// Find the date (as millis-since-epoch) since the given date.
+function one_year_ago_from(date_millis) {
+    var one_year = 1000*60*60*24*365;
+    return date_millis - one_year;
+}
+
+exports.annual_page_count = function(userid, callback) {
+    var client = rclient.getClient();
+    var pagecount = 0;
+    var replies = 0;
+    var now = +new Date();
+    // get books read within past year
+    client.zrangebyscore(user_reading_set(userid),one_year_ago_from(now),now, function(err,reply){
+        for(var i=0; i < reply.length; i++) {
+            var ean = reply[i].toString();
+            exports.get_by_ean(userid,ean,function(err,reading) {
+                replies++;
+                if (err && !_.isNull(reading)) {
+                    console.log("Error loading reading, userid:",userid," ean:",ean);
+                } else {
+                    var pages = +reading.book.number_of_pages;
+                    if (_.isNumber(pages)) {
+                        pagecount += pages;
+                    }
+                }
+                if (replies == reply.length) {
+                    callback(err,pagecount);
+                }
+            });
+        }
+    });
+};
+
+
 // Calculate how many books have been read in the past year
 exports.annual_book_count = function(userid, callback) {
     var client = rclient.getClient();
-    var one_year = 1000*60*60*24*365; // leap year calculations??
     var now = +new Date();
-    var one_year_ago = now - one_year;
     // get books read within past year
     // client.zrangebyscore(user_reading_set(userid),one_year_ago,now, function(err,reply){
     // get count of books between last year and now
-    client.zcount(user_reading_set(userid),one_year_ago,now, function(err,reply){
+    client.zcount(user_reading_set(userid),one_year_ago_from(now),now, function(err,reply){
         if (err) {
             callback(err,null);
         } else if (_.isNull(reply)) {

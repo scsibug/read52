@@ -105,6 +105,12 @@ app.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
+app.get('/user/:id/annual_page_count', function(req,res) {
+    readings.annual_page_count(req.params.id, function(err,pagecount) {
+        res.send(pagecount.toString());
+    });
+});
+
 app.get('/user/:id', function(req, res) {
     users.user_id_exists(req.params.id,function(err,exists) {
         if (err || !exists) {
@@ -121,14 +127,21 @@ app.get('/user/:id', function(req, res) {
                     console.log(err);
                     res.redirect('/');
                 }
-                res.render('user', {
-                    locals: {title: "User",
-                             nav: "user",
-                             bookcount: bookcount,
-                             user: req.getAuthDetails().user,
-                             userIsHome: authzUser(req,req.params.id),
-                             readings: myreadings
-                            }
+                readings.annual_page_count(req.params.id, function(err,pagecount) {
+                    if (err) {
+                        console.log(err);
+                        res.redirect('/');
+                    }
+                    res.render('user', {
+                        locals: {title: "User",
+                                 nav: "user",
+                                 bookcount: bookcount,
+                                 user: req.getAuthDetails().user,
+                                 userIsHome: authzUser(req,req.params.id),
+                                 readings: myreadings,
+                                 pagecount: pagecount.toString()
+                                }
+                    });
                 });
             });
         });
