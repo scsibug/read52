@@ -13,6 +13,9 @@ opHelper = new OperationHelper({
 // Lookup a book by ISBN-13, and get product information from AWS
 isbn_lookup_unthrottled = function(isbn_dirty, callback) {
     // normalize ISBN to 13:
+    if (_.isNull(isbn_dirty)) {
+        callback("Null ISBN", null);
+    }
     var isbn = isbnlib.to_isbn_13(isbn_dirty)
     if (_.isNull(isbn)) {
         console.log("Provided ISBN could not be parsed:",isbn);
