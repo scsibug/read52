@@ -111,17 +111,25 @@ app.get('/user/:id', function(req, res) {
             res.send("User "+req.params.id+" does not exist", 404);
             return;
         }
-        readings.readings_for_user(req.params.id,0,52,function(err,readings) {
+        readings.readings_for_user(req.params.id,0,52,function(err,myreadings) {
             if (err) {
+                console.log(err);
                 res.redirect('/');
             }
-            res.render('user', {
-                locals: {title: "User",
-                         nav: "user",
-                         user: req.getAuthDetails().user,
-                         userIsHome: authzUser(req,req.params.id),
-                         readings: readings
-                        }
+            readings.annual_book_count(req.params.id,function(err,bookcount) {
+                if (err) {
+                    console.log(err);
+                    res.redirect('/');
+                }
+                res.render('user', {
+                    locals: {title: "User",
+                             nav: "user",
+                             bookcount: bookcount,
+                             user: req.getAuthDetails().user,
+                             userIsHome: authzUser(req,req.params.id),
+                             readings: myreadings
+                            }
+                });
             });
         });
     });

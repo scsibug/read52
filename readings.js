@@ -132,6 +132,26 @@ Reading.prototype.toJSON = function() {
     return json;
 };
 
+// Calculate how many books have been read in the past year
+exports.annual_book_count = function(userid, callback) {
+    var client = rclient.getClient();
+    var one_year = 1000*60*60*24*365; // leap year calculations??
+    var now = +new Date();
+    var one_year_ago = now - one_year;
+    // get books read within past year
+    // client.zrangebyscore(user_reading_set(userid),one_year_ago,now, function(err,reply){
+    // get count of books between last year and now
+    client.zcount(user_reading_set(userid),one_year_ago,now, function(err,reply){
+        if (err) {
+            callback(err,null);
+        } else if (_.isNull(reply)) {
+            callback("Could not find key for sorted set of books",null);
+        } else {
+            callback(null,reply);
+        }
+    });
+};
+
 exports.readings_for_user = function(userid, start, end, callback) {
     var client = rclient.getClient();
     client.zrange(user_reading_set(userid),start,end, function(err,reply){

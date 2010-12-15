@@ -10,10 +10,16 @@
 </div>
 
 <div class="span-24 last">
+   <h2>I have read <strong><%= bookcount %></strong> books in the past year!</h2>
+</div>
+
+<div class="span-24 last">
 <% for (ix in readings) {
    reading = readings[ix];
 %>
-<img src="<%= reading.book.amz_img_medium%>">
+<a href="/book/<%=reading.isbn%>">
+<img src="<%= reading.book.amz_img_medium%>" title="<%= reading.book.title %>" alt="<%= reading.book.title%>" />
+</a>
 <% } %>
 </div>
 
