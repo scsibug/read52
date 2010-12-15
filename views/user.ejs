@@ -1,5 +1,5 @@
 <div class="span-24 last">
-   <h1>User</h1>
+   <h1><%= user.name %></h1>
    <% if (userIsHome) { %>
    <form action="/user/<%= user.id %>/read" method="post">
    <label>ISBN</label><br />
@@ -7,18 +7,14 @@
    <input type="submit" value="Submit" /><br />
    </form>
    <% } %>
+</div>
 
+<div class="span-24 last">
 <% for (ix in readings) {
    reading = readings[ix];
 %>
-<hr />
-<div class="span-24 last">
-<div class="span-3"><img src="<%= reading.book.amz_img_small%>"></div>
-<div class="span-9"><a href="/book/<%= reading.book.ean %>"><%= reading.book.title %></a></div>
-<div class="span-4"><%= reading.book.author %></div>
-<div class="span-4"><%= reading.book.number_of_pages %></div>
-<div class="span-4 last"><%= reading.completion_date %></div>
-</div>
+<img src="<%= reading.book.amz_img_medium%>">
 <% } %>
+</div>
 
 </div>
