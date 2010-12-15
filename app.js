@@ -95,17 +95,23 @@ app.get('/logout', function(req, res) {
 });
 
 app.get('/user/:id', function(req, res) {
-    readings.readings_for_user(req.params.id,0,52,function(err,readings) {
-        if (err) {
-            res.redirect('/');
+    users.user_id_exists(req.params.id,function(err,exists) {
+        if (err || !exists) {
+            res.send("User "+req.params.id+" does not exist", 404);
+            return;
         }
-        res.render('user', {
-            locals: {title: "User",
-                     nav: "user",
-                     user: req.getAuthDetails().user,
-                     userIsHome: authzUser(req,req.params.id),
-                     readings: readings,
-                    }
+        readings.readings_for_user(req.params.id,0,52,function(err,readings) {
+            if (err) {
+                res.redirect('/');
+            }
+            res.render('user', {
+                locals: {title: "User",
+                         nav: "user",
+                         user: req.getAuthDetails().user,
+                         userIsHome: authzUser(req,req.params.id),
+                         readings: readings,
+                        }
+            });
         });
     });
 });
@@ -223,6 +229,8 @@ socket.on('connection', function(client){
         if (err) {
             console.log("Err: ",err);
         }
-        client.send(res.reverse());
+        if (!_.isNull(res)) {
+            client.send(res.reverse());
+        }
     });
 });
