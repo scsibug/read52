@@ -28,12 +28,19 @@ exports.Book = function Book (ean,callback) {
         context.number_of_pages = result.ItemAttributes.NumberOfPages;
         if (!_.isUndefined(result.SmallImage)) {
             context.amz_img_small = result.SmallImage.URL;
+        } else {
+            context.amz_img_small = "/images/no_image_available_small.png";
         }
         if (!_.isUndefined(result.MediumImage)) {
             context.amz_img_medium = result.MediumImage.URL;
+        } else {
+            context.amz_img_medium = "/images/no_image_available_medium.png";
         }
         if (!_.isUndefined(result.LargeImage)) {
             context.amz_img_large = result.LargeImage.URL;
+        } else {
+            // TODO: make large version
+            context.amz_img_large = "/images/no_image_available_medium.png";
         }
         context.amz_detail_url = result.DetailPageURL;
         callback(err,context);
