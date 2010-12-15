@@ -170,7 +170,6 @@ exports.readings_for_user = function(userid, start, end, callback) {
         }
         for(var i=0; i < reply.length; i++) {
             var ean = reply[i].toString();
-            var reading_key = key_from_id(userid,ean);
             exports.get_by_ean(userid,ean,function(err,reading) {
                 if (err) {
                     console.log("Error loading reading, userid:",userid," ean:",ean);
@@ -179,7 +178,7 @@ exports.readings_for_user = function(userid, start, end, callback) {
                 }
                 replies++;
                 if (replies == reply.length) {
-                    callback(err,readings);
+                    callback(err,readings.reverse());
                 }
             });
         }
