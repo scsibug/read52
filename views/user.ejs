@@ -1,21 +1,28 @@
+<script>
+  $(document).ready(function() {
+  $("#datepicker").datepicker();
+  });
+</script>
+
 <div class="span-12">
    <h1><%= pageuser.name %></h1>
 </div>
 
 <% if(userIsHome) { %>
 <div class="prepend-4 span-8 last">
-  <h2>Add Book</h2>
+  <h2><a href="#" onclick="$('#add-book-form').fadeIn()">Add Book</a></h2>
 </div>
 <% } %>
 
 </div>
 
 <% if (userIsHome) { %>
-<div class="container">
+<div id="add-book-form" class="hidden container">
   <div class="span-24 last">
     <form action="/user/<%= user.id %>/read" method="post">
       <label>ISBN</label><br />
       <input type="text" class="title" name="isbn" /> <br />
+      <div type="text" id="datepicker"></div>
       <input type="submit" value="Submit" /><br />
     </form>
   </div>

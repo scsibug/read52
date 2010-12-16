@@ -64,4 +64,8 @@ p.elab
   background: #555;
   color: white;
 }
+.hidden
+{ 
+  display: none
+}
 /*******************************/
