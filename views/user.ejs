@@ -1,26 +1,39 @@
-<div class="span-24 last">
-   <h1><%= user.name %></h1>
-   <% if (userIsHome) { %>
-   <form action="/user/<%= user.id %>/read" method="post">
-   <label>ISBN</label><br />
-   <input type="text" class="title" name="isbn" /> <br />
-   <input type="submit" value="Submit" /><br />
-   </form>
-   <% } %>
+<div class="span-12">
+   <h1><%= pageuser.name %></h1>
 </div>
 
-<div class="span-24 last">
-   <h2>I have read <strong><%= bookcount %></strong> books in the past year! (<%= pagecount %> pages)</h2>
+<% if(userIsHome) { %>
+<div class="prepend-4 span-8 last">
+  <h2>Add Book</h2>
 </div>
-
-<div class="span-24 last">
-<% for (ix in readings) {
-   reading = readings[ix];
-%>
-<a href="/book/<%=reading.isbn%>">
-<img src="<%= reading.book.amz_img_medium%>" title="<%= reading.book.title %>" alt="<%= reading.book.title%>" />
-</a>
 <% } %>
+
 </div>
 
+<% if (userIsHome) { %>
+<div class="container">
+  <div class="span-24 last">
+    <form action="/user/<%= user.id %>/read" method="post">
+      <label>ISBN</label><br />
+      <input type="text" class="title" name="isbn" /> <br />
+      <input type="submit" value="Submit" /><br />
+    </form>
+  </div>
+</div>
+<% } %>
+
+<div class="container">
+  <div class="span-24 last">
+    <h2>I have read <strong><%= bookcount %></strong> books in the past year! (<%= pagecount %> pages)</h2>
+  </div>
+
+  <div class="span-24 last">
+    <% for (ix in readings) {
+       reading = readings[ix];
+     %>
+    <a href="/book/<%=reading.isbn%>">
+      <img src="<%= reading.book.amz_img_medium%>" title="<%= reading.book.title %>" alt="<%= reading.book.title%>" />
+    </a>
+    <% } %>
+  </div>
 </div>

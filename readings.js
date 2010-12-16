@@ -143,6 +143,14 @@ exports.annual_page_count = function(userid, callback) {
     var now = +new Date();
     // get books read within past year
     client.zrangebyscore(user_reading_set(userid),one_year_ago_from(now),now, function(err,reply){
+        if (err) {
+            console.log(err);
+            callback("Could not get page count", 0);
+            return;
+        } else if (_.isNull(reply)) {
+            callback(null,0);
+            return;
+        }
         for(var i=0; i < reply.length; i++) {
             var ean = reply[i].toString();
             exports.get_by_ean(userid,ean,function(err,reading) {

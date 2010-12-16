@@ -34,6 +34,12 @@
           <li><a href="/book" title="Books">Books</a></li> 
           <% } %>
 
+          <% if (nav=="user") { %>
+          <li>Users</li> 
+          <% } else { %>
+          <li><a href="/users" title="Users">Users</a></li> 
+          <% } %>
+
           <% if (user == null) { %>
             <% if (nav=="login") { %>
             <li>Login</li> 
@@ -41,7 +47,7 @@
             <li><a href="/login" title="Sign In">Sign In</a></li> 
             <% } %>
           <% } else { %>
-            <% if (nav=="user") { %>
+            <% if (nav=="userhome") { %>
               <li>Your Account</li> 
             <% } else { %>
               <li><a href="/user/<%= user.id %>" title="Your Account">Your Account</a></li> 
@@ -51,6 +57,6 @@
         </ul> 
       </div>
       <hr />
-      <%- body %>
+    <%- body %>
   </body>
 </html>

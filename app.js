@@ -117,30 +117,41 @@ app.get('/user/:id', function(req, res) {
             res.send("User "+req.params.id+" does not exist", 404);
             return;
         }
-        readings.readings_for_user(req.params.id,0,52,function(err,myreadings) {
+        users.get_by_id(req.params.id, function(err, pageuser) {
             if (err) {
                 console.log(err);
                 res.redirect('/');
             }
-            readings.annual_book_count(req.params.id,function(err,bookcount) {
+            readings.readings_for_user(req.params.id,0,52,function(err,myreadings) {
                 if (err) {
                     console.log(err);
                     res.redirect('/');
                 }
-                readings.annual_page_count(req.params.id, function(err,pagecount) {
+                readings.annual_book_count(req.params.id,function(err,bookcount) {
                     if (err) {
                         console.log(err);
                         res.redirect('/');
                     }
-                    res.render('user', {
-                        locals: {title: "User",
-                                 nav: "user",
-                                 bookcount: bookcount,
-                                 user: req.getAuthDetails().user,
-                                 userIsHome: authzUser(req,req.params.id),
-                                 readings: myreadings,
-                                 pagecount: pagecount.toString()
-                                }
+                    readings.annual_page_count(req.params.id, function(err,pagecount) {
+                        if (err) {
+                            console.log(err);
+                            res.redirect('/');
+                        }
+                        var nav = "user";
+                        if (authzUser(req,req.params.id)) {
+                            nav = "userhome";
+                        }
+                        res.render('user', {
+                            locals: {title: "User",
+                                     nav: nav,
+                                     bookcount: bookcount,
+                                     user: req.getAuthDetails().user,
+                                     pageuser: pageuser,
+                                     userIsHome: authzUser(req,req.params.id),
+                                     readings: myreadings,
+                                     pagecount: pagecount.toString()
+                                    }
+                        });
                     });
                 });
             });
