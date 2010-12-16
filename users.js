@@ -67,10 +67,14 @@ function User (attrs) {
     return context;
 }
 
-exports.get_by_id = function(id, callback) {
+exports.get_by_id = function(id,callback) {
+    get_by_key(key_from_id(id),callback);
+};
+
+var get_by_key = function(key, callback) {
     var client = rclient.getClient();
     // Lookup user by ID directly
-    client.get(key_from_id(id), function(err,result) {
+    client.get(key, function(err,result) {
         var json = JSON.parse(result);
         var user = new User(json);
         callback(err,user);
@@ -136,6 +140,29 @@ User.prototype.setPassword = function setPassword(pass) {
 
 User.prototype.checkPassword = function checkPassword(test_pass,callback) {
     callback(null,(pw.validate(this.password_hash, this.salt, test_pass)));
+};
+
+exports.get_users = function(callback) {
+    var client = rclient.getClient();
+    var replies = 0;
+    var users = [];
+    // hack, should make a set if we really want this functionality.
+    client.keys(key_from_id("*"), function(err, reply) {
+        for(var i=0; i < reply.length; i++) {
+            var user_key = reply[i].toString();
+            get_by_key(user_key,function(err,thisuser) {
+                if (err) {
+                    console.log("Error loading user key:",user_key);
+                } else {
+                    users.push(thisuser);
+                }
+                replies++;
+                if (replies == reply.length) {
+                    callback(err,users);
+                }
+            });
+        }
+    });
 };
 
 exports.User = User;

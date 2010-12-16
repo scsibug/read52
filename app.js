@@ -105,6 +105,18 @@ app.get('/logout', function(req, res) {
     res.redirect('/');
 });
 
+app.get('/users', function(req, res) {
+    users.get_users(function(err,users) {
+        res.render('users', {
+            locals: {title: "Users",
+                     nav: "users",
+                     user: req.getAuthDetails().user,
+                     users: users
+                    }
+        });
+    });
+});
+
 app.get('/user/:id/annual_page_count', function(req,res) {
     readings.annual_page_count(req.params.id, function(err,pagecount) {
         res.send(pagecount.toString());
