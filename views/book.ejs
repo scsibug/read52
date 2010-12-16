@@ -18,6 +18,10 @@
 <dt>Author</dt><dd><%= book.author %></dd>
 <% } %>
 
+<% if (book.dewey_decimal) { %>
+<dt>Dewey Decimal Number</dt><dd><%= book.dewey_decimal %></dd>
+<% } %>
+
 <% if (book.number_of_pages) { %>
 <dt>Pages</dt><dd><%= book.number_of_pages %></dd>
 <% } %>

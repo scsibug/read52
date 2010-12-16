@@ -25,6 +25,7 @@ exports.Book = function Book (ean_dirty,callback) {
         context.raw = JSON.stringify(result,null, 2);
         context.title = result.ItemAttributes.Title;
         context.ean = result.ItemAttributes.EAN;
+        context.dewey_decimal = result.ItemAttributes.DeweyDecimalNumber;
         context.asin = result.ASIN;
         context.author = result.ItemAttributes.Author;
         context.isbn = result.ItemAttributes.ISBN;
