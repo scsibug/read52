@@ -1,6 +1,6 @@
 <script>
   $(document).ready(function() {
-  $("#datepicker").datepicker();
+  $(".date-pick").datepicker({formatDate: '@', altField: '#completion-date', altFormat: '@', showButtonPanel: true});
   });
 </script>
 
@@ -10,22 +10,28 @@
 
 <% if(userIsHome) { %>
 <div class="prepend-4 span-8 last">
-  <h2><a href="#" onclick="$('#add-book-form').fadeIn()">Add Book</a></h2>
+  <h2><a href="#" onclick="$('#add-book').fadeIn()">Add Book</a></h2>
 </div>
 <% } %>
 
 </div>
 
 <% if (userIsHome) { %>
-<div id="add-book-form" class="hidden container">
-  <div class="span-24 last">
-    <form action="/user/<%= user.id %>/read" method="post">
-      <label>ISBN</label><br />
-      <input type="text" class="title" name="isbn" /> <br />
-      <div type="text" id="datepicker"></div>
-      <input type="submit" value="Submit" /><br />
+<div id="add-book" class="hidden container">
+    <form id="add-book-form" action="/user/<%= user.id %>/read" method="post">
+      <div class="span-12">
+        <label for="isbn">ISBN</label><br />
+        <input id="isbn" type="text" class="title" name="isbn" /> <br />
+      </div>
+      <div class="span-12 last">
+        <label for="completion-date">Date Finished</label><br />
+        <div class="date-pick"></div>
+        <input type="hidden" name="completion-date" id="completion-date"/>
+      </div>
+      <div class="prepend-10 span-2 append-10 last">
+        <button class="ui-state-default ui-corner-all" type="submit" value="Submit">Submit</button><br />
+      </div>
     </form>
-  </div>
 </div>
 <% } %>
 

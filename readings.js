@@ -56,10 +56,10 @@ function Reading (attrs) {
 // Creating a reading should save the reading itself, and associate it with a user.
 exports.create = function(attrs, callback) {
     var client = rclient.getClient();
-    if (!_.isDate(attrs.creation_date)) {
+    if (!_.isNumber(attrs.creation_date)) {
         attrs.creation_date = +new Date();
     }
-    if (!_.isDate(attrs.completion_date)) {
+    if (!_.isNumber(attrs.completion_date)) {
         attrs.completion_date = +new Date();
     }
     var reading_id = key_from_id(attrs.userid,attrs.isbn);

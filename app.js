@@ -166,6 +166,12 @@ app.get('/user/:id/read/:ean', function (req, res) {
 
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
+    var completion_date = parseInt(req.body["completion-date"]);
+    console.log('submitted completion_date', completion_date);
+    if (_.isNull(completion_date) || _.isNull(completion_date) || !_.isNumber(completion_date)) {
+        completion_date = +new Date();
+        console.log("set completion date to the current timestamp");
+    }
     if (authzUser(req,req.params.id)) {
         var ean = isbn.to_isbn_13(req.body.isbn);
         if (_.isNull(ean)) {
@@ -178,7 +184,7 @@ app.post('/user/:id/read', function (req, res) {
              isbn: ean,
              comment: req.body.comment,
              rating: req.body.rating,
-             completion_date: req.body.completion_date
+             completion_date: completion_date
             },function(err,reading) {
                 // Create book, if necessary
                 books.get_book(ean,function(err,book) {
