@@ -171,6 +171,36 @@ app.get('/user/:id', function(req, res) {
     });
 });
 
+// Get all public data a user has entered
+app.get('/user/:id/export', function (req, res) {
+    readings.readings_for_user(req.params.id,0,-1,function(err,readings) {
+        res.send(JSON.stringify(readings));
+    });
+});
+
+// Bulk import user data
+app.post('/user/:id/import', function (req, res) {
+    if (authzUser(req,req.params.id)) {
+        var importjson = JSON.parse(req.rawBody);
+        // We are expecting the body to be JSON-encoded readings.
+        // We ignore some fields(userid), and use the rest to recreate readings.
+        res.send("thanks...will try to import this!");
+        _.each(importjson,function(elem, index, list) {
+            var r = {};
+            r.userid = req.params.id;
+            r.isbn = elem.isbn;
+            r.completion_date = elem.completion_date;
+            r.rating = elem.rating;
+            r.comment = elem.comment;
+            readings.create(r,function() {console.log("created reading for",r.isbn)});
+            console.log("working on",elem);
+        });
+    } else {
+        console.log("Unauthorized POST against user",req.params.id);
+        res.send("Not authorized",401);
+    }
+});
+
 app.get('/user/:id/read/:ean', function (req, res) {
     //res.send("Request for user:"+req.params.id+", EAN:"+req.params.ean);
     res.redirect('/book/'+req.params.ean);
