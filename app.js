@@ -33,7 +33,7 @@ var authzUser = function authzUser(req,userid) {
 // Front page
 app.get('/', function(req, res){
     res.render('index', {
-        locals: { title: "52-in-52",
+        locals: { title: "Read52",
                   nav: "home",
                   user: req.getAuthDetails().user
                 }
