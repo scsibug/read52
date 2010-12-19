@@ -124,6 +124,9 @@ exports.list_books = function(start, end, callback) {
             callback(err,books);
             return;
         }
+        if (reply.length === 0) {
+            callback(null,books);
+        }
         for(var i=0; i < reply.length; i++) {
             var ean = exports.ean_from_key(reply[i].toString());
             (new exports.Book(ean, function(err,book){
