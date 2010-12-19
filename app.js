@@ -123,6 +123,22 @@ app.get('/user/:id/annual_page_count', function(req,res) {
     });
 });
 
+// This is used as an iframe for embedded "reading counts"
+app.get('/user/:id/book_count_button.html', function(req,res) {
+    readings.annual_book_count(req.params.id, function(err,bookcount) {
+        res.render('book_count_button', {
+            layout: false,
+            locals: { count: bookcount.toString() }
+        });
+    });
+});
+
+app.get('/user/:id/annual_book_count', function(req,res) {
+    readings.annual_book_count(req.params.id, function(err,bookcount) {
+        res.send(bookcount.toString());
+    });
+});
+
 app.get('/user/:id', function(req, res) {
     users.user_id_exists(req.params.id,function(err,exists) {
         if (err || !exists) {
