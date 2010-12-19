@@ -27,7 +27,7 @@ vows.describe('Users').addBatch({
             assert.equal(user.email, "scsibug@imap.cc");
         },
         'has creation date': function(err, user) {
-            assert.instanceOf(user.creation_date,Date);
+            assert.isNumber(user.creation_date);
         },
         'and a second user': {
             topic: function(user1) {
