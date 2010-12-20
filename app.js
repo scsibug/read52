@@ -218,14 +218,21 @@ app.post('/user/:id/import', function (req, res) {
 });
 
 app.get('/user/:id/read/:ean', function (req, res) {
-    readings.get_by_ean(req.params.id, req.params.ean, function(err,r) {
-        res.render('read', {
-            locals: { reading: r,
-                      title: r.book.title,
-                      nav: "books",
-                      userIsHome: authzUser(req,req.params.id),
-                      user: req.getAuthDetails().user
-                    }
+    users.get_by_id(req.params.id, function(err, pageuser) {
+        if (err) {
+            console.log(err);
+            res.redirect('/');
+        }
+        readings.get_by_ean(req.params.id, req.params.ean, function(err,r) {
+            res.render('read', {
+                locals: { reading: r,
+                          title: r.book.title,
+                          nav: "books",
+                          userIsHome: authzUser(req,req.params.id),
+                          pageuser: pageuser,
+                          user: req.getAuthDetails().user
+                        }
+            });
         });
     });
 });
