@@ -5,12 +5,12 @@
 </script>
 
 <div class="span-12">
-   <h1><%= user.name %> read <%=reading.book.title %></h1>
+   <h1><%= user.name %> <strong>read</strong> <span class="alt"><%=reading.book.title %></span></h1>
 </div>
 
 <% if(userIsHome) { %>
 <div class="prepend-4 span-8 last">
-  <h2><a href="#" onclick="$('#add-book').fadeIn()">Edit</a></h2>
+  <h2><a href="#" onclick="$('#add-book').fadeIn()">Edit (not working yet!)</a></h2>
 </div>
 <% } %>
 
