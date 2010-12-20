@@ -46,6 +46,20 @@ exports.reading_exists = function(user_id,ean,callback) {
     });
 };
 
+// take a (possibly user-input) rating, and clean it for saving to DB
+exports.clean_rating = function (dirty_rating) {
+    var clean_rating = null;
+    if (_.isString(dirty_rating)) {
+        dirty_rating = parseInt(dirty_rating);
+    }
+    if (_.isNumber(dirty_rating)) {
+        clean_rating = parseInt(dirty_rating)
+        if (clean_rating < 0) {clean_rating = 0;}
+        if (clean_rating > 100) {clean_rating = 100;}
+    }
+    return clean_rating;
+}
+
 // Create a reading object from a set of attributes.
 function Reading (attrs) {
     var context = this;
@@ -62,6 +76,7 @@ exports.create = function(attrs, callback) {
     if (!_.isNumber(attrs.completion_date)) {
         attrs.completion_date = +new Date();
     }
+    attrs.rating = exports.clean_rating(attrs.rating);
     var reading_id = key_from_id(attrs.userid,attrs.isbn);
     // Ensure there isn't an existing reading for this user/ISBN combination
     exports.reading_exists(attrs.userid,attrs.isbn,function(err,res) {
@@ -92,7 +107,12 @@ exports.get_by_ean = function(userid, ean, callback) {
             callback("Reading does not exist",null);
             return;
         }
-        var json = JSON.parse(res);
+        try {
+            var json = JSON.parse(res);
+        } catch (e) {
+            console.log(e);
+            console.log("tried to parse",res);
+        }
         var reading = new Reading(json);
         (new books.Book(ean,function(err,book) {
             reading.book = book;
@@ -107,6 +127,16 @@ Reading.prototype.load_from_json = function(json) {
         context[key] = json[key];
     });
 };
+
+// Get rating suitable for display (divisible by 5) or null
+Reading.prototype.get_rating = function get_rating() {
+    var incr = 5;
+    if (_.isNull(this.rating) || _.isUndefined(this.rating)) {
+        return null;
+    } else {
+        return (incr * parseInt(this.rating / incr));
+    }
+}
 
 Reading.prototype.save = function save(callback) {
     var client = rclient.getClient();

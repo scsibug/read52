@@ -18,10 +18,38 @@
 
 <% if (userIsHome) { %>
 <div id="add-book" class="hidden container">
+<script type="text/javascript" language="javascript">
+      $(function(){ 
+          $('#add-book-form :radio.star').rating({cancel: 'Cancel', cancelValue: '0'}); 
+        });
+</script>
+
     <form id="add-book-form" action="/user/<%= user.id %>/read" method="post">
       <div class="span-12">
         <label for="isbn">ISBN</label><br />
         <input id="isbn" type="text" class="title" name="isbn" /> <br />
+        Rating:<br />
+                            <input class="star {split:4}" type="radio" name="rating" value="5"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="10"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="15"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="20"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="25"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="30"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="35"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="40"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="45"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="50"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="55"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="60"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="65"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="70"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="75"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="80"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="85"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="90"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="95"/>
+                            <input class="star {split:4}" type="radio" name="rating" value="100"/>
+
       </div>
       <div class="span-12 last">
         <label for="completion-date">Date Finished</label><br />

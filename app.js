@@ -224,6 +224,7 @@ app.get('/user/:id/read/:ean', function (req, res) {
 
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
+    console.log(req);
     var completion_date = parseInt(req.body["completion-date"]);
     console.log('submitted completion_date', completion_date);
     if (_.isNull(completion_date) || _.isNull(completion_date) || !_.isNumber(completion_date)) {
