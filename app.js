@@ -218,8 +218,16 @@ app.post('/user/:id/import', function (req, res) {
 });
 
 app.get('/user/:id/read/:ean', function (req, res) {
-    //res.send("Request for user:"+req.params.id+", EAN:"+req.params.ean);
-    res.redirect('/book/'+req.params.ean);
+    readings.get_by_ean(req.params.id, req.params.ean, function(err,r) {
+        res.render('read', {
+            locals: { reading: r,
+                      title: r.book.title,
+                      nav: "books",
+                      userIsHome: authzUser(req,req.params.id),
+                      user: req.getAuthDetails().user
+                    }
+        });
+    });
 });
 
 // Add a book that a user has read
@@ -330,7 +338,6 @@ var socket = io.listen(app);
 actions.set_listener(function(msg) {
     socket.broadcast(msg);
 });
-
 
 socket.on('connection', function(client){
     actions.get_actions(10, function(err,res) {

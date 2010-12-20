@@ -1,0 +1,51 @@
+<script>
+  $(document).ready(function() {
+  $(".date-pick").datepicker({formatDate: '@', altField: '#completion-date', altFormat: '@', showButtonPanel: true});
+  });
+</script>
+
+<div class="span-12">
+   <h1><%= user.name %> read <%=reading.book.title %></h1>
+</div>
+
+<% if(userIsHome) { %>
+<div class="prepend-4 span-8 last">
+  <h2><a href="#" onclick="$('#add-book').fadeIn()">Edit</a></h2>
+</div>
+<% } %>
+
+</div>
+
+<div class="container">
+<div class="span-12">
+<img src="<%= reading.book.amz_img_large %>">
+</div>
+
+<div class="span-12 last">
+<dl>
+<dt>ASIN/ISBN</dt><dd><%= reading.book.asin %></dd>
+
+<% if (reading.completion_date) { %>
+<dt>Completed On</dt><dd><%= new Date(reading.completion_date) %>
+<% } %>
+
+<% if (reading.ean) { %>
+<dt>EAN/ISBN-13</dt><dd><%= reading.ean %></dd>
+<% } %>
+
+<% if (reading.book.author) { %>
+<dt>Author</dt><dd><%= reading.book.author %></dd>
+<% } %>
+
+<% if (reading.book.dewey_decimal) { %>
+<dt>Dewey Decimal Number</dt><dd><%= reading.book.dewey_decimal %></dd>
+<% } %>
+
+<% if (reading.book.number_of_pages) { %>
+<dt>Pages</dt><dd><%= reading.book.number_of_pages %></dd>
+<% } %>
+
+<dt>Details</dt><dd><a href="<%= reading.book.amz_detail_url %>">Amazon Page</a></dd>
+</dl>
+</div>
+</div>
