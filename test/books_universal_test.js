@@ -34,5 +34,22 @@ vows.describe('Books').addBatch({
             client.quit();
         }
     }
+}).addBatch({
+    'Good ASINs': {
+        topic: function() {
+            return "B00005N5PF";
+        },
+        'like': function(asin) {
+            assert.isTrue(books.isASINlike(asin));
+        },
+    },
+    'Bad ASINs': {
+        topic: function() {
+            return "B00005N5PF+";
+        },
+        'not like': function(asin) {
+            assert.isFalse(books.isASINlike(asin));
+        },
+    }
 }).export(module);
 

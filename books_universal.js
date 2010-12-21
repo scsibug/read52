@@ -13,10 +13,10 @@ var bookincr = "book_incr";
 // Collection of all book keys, scores are created_date field
 var bookzset = "univ_book_zset";
 
-// Set of books mapped by EAN
-var bookeanzset = "book_ean_set"
-// Set of books mapped by ASIN
-var bookeanzset = "book_asin_set"
+// Hash of EANs to book ID
+var bookeanzset = "ean_book_hash"
+// Hash of ASINs to book ID
+var bookeanzset = "asin_book_hash"
 
 // Keys for a book object that are eligible for serialization.
 var book_keys =
@@ -50,7 +50,7 @@ exports.detect_search_type = function (search) {
     if (!_.isNull(ean)) {
         result.type="EAN";
         result.value=ean
-    } else if (search.length === 10) {
+    } else if (exports.isASINlike(search)) {
         result.type="ASIN";
         result.value=search;
     } else {
@@ -58,4 +58,32 @@ exports.detect_search_type = function (search) {
         result.value=search;
     }
     return result;
+};
+
+// there is no test that an ASIN is valid we assume that 10
+// alphanum characters is an ASIN.
+// This checks if a string looks like an Amazon ASIN
+exports.isASINlike = function isASINlike(asin) {
+    var re = /^[A-Za-z0-9]{10}$/;
+    return re.test(asin);
+};
+
+// Create a book from a search term.
+// callback will be called with error+book
+exports.create_from_search_term = function(term,callback) {
+    var search = exports.detect_search_type(term);
+    if (search.type === "EAN") {
+        exports.get_from_ean(search.value,callback);
+    } else if (search.type === "ASIN") {
+        exports.get_from_asin(search.value,callback);
+    } else {
+        callback("Could not locate book",null);
+    }
+};
+
+exports.get_from_ean = function(ean,callback) {
+    
+};
+
+exports.get_from_asin = function(asin,callback) {
 };
