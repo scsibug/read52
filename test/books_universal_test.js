@@ -51,5 +51,22 @@ vows.describe('Books').addBatch({
             assert.isFalse(books.isASINlike(asin));
         },
     }
+}).addBatch({
+    'ISBN': {
+        topic: function() {
+            return "9780312863555";
+        },
+        'converts to URI': function(isbn) {
+            assert.equal(books.isbn_to_uri(isbn), "urn:isbn:9780312863555");
+        }
+    },
+    'ASIN': {
+        topic: function() {
+            return "020530902X";
+        },
+        'converts to URI': function(asin) {
+            assert.equal(books.asin_to_uri(asin), "http://amzn.com/020530902X");
+        }
+    },
 }).export(module);
 

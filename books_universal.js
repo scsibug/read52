@@ -8,16 +8,14 @@ var rclient = require('./redisclient');
 var isbn = require('./isbn');
 
 // Each book-thing gets a unique number
-var bookincr = "book_incr";
+var bookincr = "book:incr";
 
 // Collection of all book keys, scores are created_date field
-var bookzset = "univ_book_zset";
+var bookzset = "book:allbycreated";
 
-// We want to be able to take an EAN or ASIN and get the book ID
-// combining these prefixes with the respective identifier and doing a
-// GET should return the book ID.
-var book_ean_prefix = "book:ean:"
-var book_asin_prefix = "book:asin:"
+// We maintain a mapping of URIs (ISBN/ASIN,etc.) to book ID's.
+// This allows for a quick lookup of arbitrary identifiers to a book.
+var book_uri_hash = "book:uri"
 
 // Keys for a book object that are eligible for serialization.
 var book_keys =
@@ -38,6 +36,24 @@ var book_keys =
      "created_date", // date this book was first entered (millis-since-epoch number)
      "modified_date" // date this book was last modified (millis-since-epoch number)
     ];
+
+exports.isbn_to_uri = function(i) {
+    var isbn_num = isbn.to_isbn_13(i);
+    if (_.isNull(isbn_num)) {
+        return null
+    } else {
+        return "urn:isbn:"+isbn_num;
+    }
+}
+
+exports.asin_to_uri = function(asin) {
+    if (_.isNull(asin)||!exports.isASINlike(asin)) {
+        return null
+    } else {
+        return "http://amzn.com/"+asin;
+    }
+}
+
 
 // Detect what our search term contains.
 // Returns either "EAN", "ASIN", or "unknown"
