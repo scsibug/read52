@@ -140,12 +140,12 @@ Book.prototype.update_indexes = function(callback) {
     var client = rclient.getClient();
     // if EAN exists, use that and clear out other indexes.
     // if ASIN exists, use that and clear out other indexes.
-var book_ean_prefix = "book:ean:"
-var book_asin_prefix = "book:asin:"
+    var book_ean_prefix = "book:ean:";
+    var book_asin_prefix = "book:asin:";
     if (!_.isNull(this.ean) && (!_.isUndefined(this.ean))) {
         client.set(book_ean_prefix+this.ean,this.id,callback);
         client.hdel(book_asin_prefix+this.asin,this.asin,this.id,callback);
-    } else (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
+    } else if (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
         client.hset(this.ean,this.id,callback);
     }
 }
