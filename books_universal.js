@@ -142,13 +142,20 @@ Book.prototype.save = function save(callback) {
     
 };
 
-Book.prototype.update_indexes = function() {
+Book.prototype.update_indexes = function(callback) {
     var client = rclient.getClient();
+    var actions_complete = 0; var actions_total = 2;
+    var notify = function(err,result) {
+        actions_complete++;
+        if (actions_complete == actions_total) {
+            if (!.isNull(callback)) callback();
+        }
+    }
     if (!_.isNull(this.ean) && (!_.isUndefined(this.ean))) {
-        client.hset(book_uri_hash,exports.isbn_to_uri(this.ean),this.id,null);
+        client.hset(book_uri_hash,exports.isbn_to_uri(this.ean),this.id,notify)
     }
     if (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
-        client.hset(book_uri_hash,exports.asin_to_uri(this.asin),this.id,null);
+        client.hset(book_uri_hash,exports.asin_to_uri(this.asin),this.id,notify);
     }
 }
 

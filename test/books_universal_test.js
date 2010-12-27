@@ -67,6 +67,6 @@ vows.describe('Books').addBatch({
         'converts to URI': function(asin) {
             assert.equal(books.asin_to_uri(asin), "http://amzn.com/020530902X");
         }
-    },
+    }
 }).export(module);
 
