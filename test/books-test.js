@@ -1,111 +1,72 @@
 var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
-var books = require('../books');
+var books = require('../books_universal');
 var rclient = require('../redisclient');
 var client = rclient.initClient(15);
 var _ = require('underscore');
 client.flushdb();
 vows.describe('Books').addBatch({
-    'Create Book': {
+    'EAN': {
         topic: function() {
-            var context = this;
-            var b = new books.Book("9780060733353",function(err,res) {
-                context.callback(err,b);
-            });
+            return books.detect_search_type('978-0452011878');
         },
-        'uses Book constructor': function(err,book) {
-            assert.equal(book.constructor.name, "Book");
+        'search type&value': function(val) {
+            assert.deepEqual(val, {type: "EAN", value: "9780452011878"});
         },
-        'has ASIN': function(err,book) {
-            assert.equal(book.asin, "0060733357");
-        },
-        'has Title': function(err, book) {
-            assert.equal(book.title, "The Confusion (The Baroque Cycle, Vol. 2)");
-        },
-        'has ISBN': function(err, book) {
-            assert.equal(book.isbn, "0060733357");
-        },
-        'has EAN': function(err, book) {
-            assert.equal(book.ean, "9780060733353");
-        },
-        'has Author': function(err, book) {
-            assert.equal(book.author, "Neal Stephenson");
-        },
-        'has NumberOfPages': function(err, book) {
-            assert.equal(book.number_of_pages, "848");
-        },
-        'has Images': function(err, book) {
-            assert.isString(book.amz_img_small);
-            assert.isString(book.amz_img_medium);
-            assert.isString(book.amz_img_large);
-        },
-        'has Amazon details page': function(err, book) {
-            assert.isString(book.amz_detail_url);
-        }
-    }
-}).addBatch({
-    'Key/EAN conversion': {
-        topic: "9780060733353",
-        'key->ean': function(ean) {
-            assert.equal(books.ean_from_key("book:"+ean+":amz"), "9780060733353");
-        },
-        'ean->key': function(ean) {
-            assert.equal(books.key_from_ean(ean), "book:9780060733353:amz");
-        }
-    }
-}).addBatch({
-    'Book Listing': {
+    },
+    'ISBN-10': {
         topic: function() {
-            var context = this;
-            // flush db, add two books, and get a full list.
-            client.flushdb(function() {
-                books.list_books(0,99,context.callback);
-            });
+            return books.detect_search_type('0452011876');
         },
-        'No books returns array': function(err,booklist) {
-            assert.isTrue(_.isArray(booklist));
-            assert.equal(booklist.length,0);
-        }
-    }
-}).addBatch({
-    'Book Listing': {
+        'search type&value': function(val) {
+            assert.deepEqual(val, {type: "EAN", value: "9780452011878"});
+        },
+    },
+    'ASIN': {
         topic: function() {
-            var context = this;
-            // flush db, add two books, and get a full list.
-            client.flushdb(function() {
-                (new books.Book("9780060733353",function(err,b) {
-                    (new books.Book("9780471292524",function(err,book) {
-                        books.list_books(0,99,context.callback);
-                    }));
-                }));
-            });
+            return books.detect_search_type('B003V8B5XO');
         },
-        'returns Books': function(err,booklist) {
-            _.each(booklist,function(b) {
-                assert.equal(b.constructor.name, "Book");
-            });
-        },
-        'has correct count': function(err, booklist) {
-            assert.equal(booklist.length, 2);
-        },
-        'contains correct books': function(err,booklist) {
-            assert.equal(booklist[0].title, "The Confusion (The Baroque Cycle, Vol. 2)");
-            assert.equal(booklist[1].title,"Developing Products in Half the Time: New Rules, New Tools, 2nd Edition");
-        },
-        'count': {
-            topic: function(booklist) {
-                var context = this;
-                books.book_count(function(err,count) {
-                    context.callback(err,count,booklist);
-                });
-            },
-            'matches count': function(err, count, booklist) {
-                assert.equal(booklist.length, count);
-            }
+        'search type&value': function(val) {
+            assert.deepEqual(val, {type: "ASIN", value: "B003V8B5XO"});
         },
         teardown: function() {
             client.quit();
         }
     }
+}).addBatch({
+    'Good ASINs': {
+        topic: function() {
+            return "B00005N5PF";
+        },
+        'like': function(asin) {
+            assert.isTrue(books.isASINlike(asin));
+        },
+    },
+    'Bad ASINs': {
+        topic: function() {
+            return "B00005N5PF+";
+        },
+        'not like': function(asin) {
+            assert.isFalse(books.isASINlike(asin));
+        },
+    }
+}).addBatch({
+    'ISBN': {
+        topic: function() {
+            return "9780312863555";
+        },
+        'converts to URI': function(isbn) {
+            assert.equal(books.isbn_to_uri(isbn), "urn:isbn:9780312863555");
+        }
+    },
+    'ASIN': {
+        topic: function() {
+            return "020530902X";
+        },
+        'converts to URI': function(asin) {
+            assert.equal(books.asin_to_uri(asin), "http://amzn.com/020530902X");
+        }
+    }
 }).export(module);
+

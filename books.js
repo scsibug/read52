@@ -1,141 +1,170 @@
-// Module to manage books
-// Stores all the metadata we get from Amazon's Product API.
+// Module to manage books with arbitrary identification and retrieval schemes.
 var sys = require('sys');
 var _ = require('underscore');
-var isbn = require('./isbn');
+require('./lib/underscore.strings');
+var strings = require('./lib/underscore.strings');
+_.mixin(_s); // extend underscore with strings
 var rclient = require('./redisclient');
-var book_lookup = require('./book_lookup');
+var isbn = require('./isbn');
 
-// Collection of all book keys, scores are ISBN
-var bookzset = "book_zset";
+// Each book-thing gets a unique number
+var bookincr = "book:incr";
 
-exports.key_from_ean = function (ean) {
-    return ("book:"+ean+":amz");
+// Collection of all book keys, scores are created_date field
+var bookzset = "book:allbycreated";
+
+// We maintain a mapping of URIs (ISBN/ASIN,etc.) to book ID's.
+// This allows for a quick lookup of arbitrary identifiers to a book.
+var book_uri_hash = "book:uri"
+
+// Keys for a book object that are eligible for serialization.
+var book_keys =
+    ["id", // our unique numeric identifier
+     "datasource", // where information was retrieved
+     "ean", // EAN/ISBN-13
+     "isbn10", // ISBN-10
+     "asin", // Amazon identifier (useful for kindle books)
+     "librarything_work", // LibraryThing work
+     "url", // where to direct users for more info (amazon referral, librarything work, etc.)
+     "title", // book title
+     "authors", // array of author names
+     "pages", // number of pages in the book
+     "dewey_decimal_number",
+     "cover_image_url_small", // link to a small cover image
+     "cover_image_url_medium", // link to a medium-sized cover image
+     "cover_image_url_large", // link to a large cover image
+     "created_date", // date this book was first entered (millis-since-epoch number)
+     "modified_date" // date this book was last modified (millis-since-epoch number)
+    ];
+
+exports.isbn_to_uri = function(i) {
+    var isbn_num = isbn.to_isbn_13(i);
+    if (_.isNull(isbn_num)) {
+        return null
+    } else {
+        return "urn:isbn:"+isbn_num;
+    }
+}
+
+exports.asin_to_uri = function(asin) {
+    if (_.isNull(asin)||!exports.isASINlike(asin)) {
+        return null
+    } else {
+        return "http://amzn.com/"+asin;
+    }
+}
+
+// Detect what our search term contains.
+// Returns either "EAN", "ASIN", or "unknown"
+// Return an object with type/value attributes:
+//  type is "EAN", "ASIN", or "unknown".
+//  value will be the "sanitized" term.
+exports.detect_search_type = function (search) {
+    var result = {}
+    var search = _.trim(search);
+    var ean = isbn.to_isbn_13(search);
+    if (!_.isNull(ean)) {
+        result.type="EAN";
+        result.value=ean
+    } else if (exports.isASINlike(search)) {
+        result.type="ASIN";
+        result.value=search;
+    } else {
+        result.type="unknown";
+        result.value=search;
+    }
+    return result;
 };
 
-exports.ean_from_key = function (key) {
-    return key.replace(/^book:/,"").replace(/:amz$/,"");
+// there is no test that an ASIN is valid we assume that 10
+// alphanum characters is an ASIN.
+// This checks if a string looks like an Amazon ASIN
+exports.isASINlike = function isASINlike(asin) {
+    var re = /^[A-Za-z0-9]{10}$/;
+    return re.test(asin);
 };
 
-exports.Book = function Book (ean_dirty,callback) {
-    // need to check for valid EAN, or convert from ISBN-10
-    var ean = isbn.to_isbn_13(ean_dirty);
+// Create a book from a search term.
+// callback will be called with error+book
+exports.create_from_search_term = function(term,callback) {
+    var search = exports.detect_search_type(term);
+    if (search.type === "EAN") {
+        exports.get_from_ean(search.value,callback);
+    } else if (search.type === "ASIN") {
+        //exports.get_from_asin(search.value,callback);
+        callback("We do not support ASIN (Amazon) identifiers just yet...",null);
+    } else {
+        callback("Could not locate book",null);
+    }
+};
+
+// Get the key for a book object from its unique ID
+function id_to_key (id) {
+    return "book:info:"+id;
+};
+
+// Get an existing book via ID
+exports.get_from_id = function(id, callback) {
+}
+
+// Get an existing book via EAN
+exports.get_from_uri = function(ean,callback) {
+};
+
+function Book (attrs) {
     var context = this;
-    exports.get_book(ean,function(err,result) {
-        context.raw = JSON.stringify(result,null, 2);
-        context.title = result.ItemAttributes.Title;
-        context.ean = result.ItemAttributes.EAN;
-        context.dewey_decimal = result.ItemAttributes.DeweyDecimalNumber;
-        context.asin = result.ASIN;
-        context.author = result.ItemAttributes.Author;
-        context.isbn = result.ItemAttributes.ISBN;
-        context.number_of_pages = result.ItemAttributes.NumberOfPages;
-        if (!_.isUndefined(result.SmallImage)) {
-            context.amz_img_small = result.SmallImage.URL;
-        } else {
-            context.amz_img_small = "/images/no_image_available_small.png";
-        }
-        if (!_.isUndefined(result.MediumImage)) {
-            context.amz_img_medium = result.MediumImage.URL;
-        } else {
-            context.amz_img_medium = "/images/no_image_available_medium.png";
-        }
-        if (!_.isUndefined(result.LargeImage)) {
-            context.amz_img_large = result.LargeImage.URL;
-        } else {
-            // TODO: make large version
-            context.amz_img_large = "/images/no_image_available_medium.png";
-        }
-        context.amz_detail_url = result.DetailPageURL;
-        callback(err,context);
+    context.load_from_json(attrs);
+    return context;
+}
+
+Book.prototype.load_from_json = function(json) {
+    var context = this;
+    _.select(reading_keys, function (key) {
+        context[key] = json[key];
     });
 };
 
-// Take an EAN/ISBN-13 and return book
-// structure, querying Amazon and saving into Redis if necessary.
-exports.get_book = function(ean, callback) {
+// Save a book to redis
+Book.prototype.save = function save(callback) {
     var client = rclient.getClient();
-    // check if we've saved information about this book before.
-    client.get(exports.key_from_ean(ean), function(err,result) {
-        if (err) {
-            console.log("Error:",err);
-        } else if (_.isNull(result)) {
-            // book is not in database, need to query AWS and save
-            exports.save_book(ean,callback);
-        } else {
-            // book exists, just need to instantiate it
-            callback(err,JSON.parse(result));
-        }
-    });
-};
-
-// Query Redis for a book, but do not invoke AWS.
-exports.query_book = function(ean,callback) {
-    var client = rclient.getClient();
-    client.get(exports.key_from_ean(ean), function(err,result) {
+    var context = this;
+    var obj_string = JSON.stringify(context);
+    client.set(id_to_key(context.id),obj_string, function(err,r) {
         if (err) {
             callback(err,null);
         } else {
-            callback(err,JSON.parse(result));
+            // callback when the book itself is saved
+            callback(err,context);
+            // update hash entries for ean/asin
+            context.update_indexes();
         }
     });
 };
 
-// Lookup a book through AWS, save into Redis store, and return book.
-exports.save_book = function(ean, callback) {
+Book.prototype.update_indexes = function(callback) {
     var client = rclient.getClient();
-    book_lookup.isbn_lookup(ean, function(err, result) {
-        if (err) {
-            console.log("Error:",err);
-            callback(err,null);
-        } else {
-            if(! _.isUndefined(result)) {
-                var book_key = exports.key_from_ean(ean);
-                client.set(book_key, JSON.stringify(result) ,function(err,set_result){
-                    if (err) {
-                        console.log("Error:",err);
-                        callback(err,null);
-                    } else {
-                        // Add this key to the set of books
-                        client.zadd(bookzset,ean,book_key);
-                        callback(null,result);
-                    }
-                });
-            }
+    var actions_complete = 0; var actions_total = 2;
+    var notify = function(err,result) {
+        actions_complete++;
+        if (actions_complete == actions_total) {
+            if (!.isNull(callback)) callback();
         }
+    }
+    if (!_.isNull(this.ean) && (!_.isUndefined(this.ean))) {
+        client.hset(book_uri_hash,exports.isbn_to_uri(this.ean),this.id,notify)
+    }
+    if (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
+        client.hset(book_uri_hash,exports.asin_to_uri(this.asin),this.id,notify);
+    }
+}
+
+Book.prototype.toJSON = function() {
+    var json = {};
+    var context = this;
+    _.select(reading_keys, function (key) {
+        json[key] = context[key];
     });
+    return json;
 };
 
-// How many books exist in the DB?
-exports.book_count = function(callback) {
-    var client = rclient.getClient();
-    client.zcard(bookzset,callback);
-};
-
-exports.list_books = function(start, end, callback) {
-    var client = rclient.getClient();
-    client.zrange(bookzset,start,end, function(err,reply){
-        var replies = 0;
-        var books = [];
-        if (_.isNull(reply)) {
-            if (err) {
-                console.log("Error:",err);
-            }
-            callback(err,books);
-            return;
-        }
-        if (reply.length === 0) {
-            callback(null,books);
-        }
-        for(var i=0; i < reply.length; i++) {
-            var ean = exports.ean_from_key(reply[i].toString());
-            (new exports.Book(ean, function(err,book){
-                books.push(book);
-                replies++;
-                if (replies == reply.length) {
-                    callback(err, books);
-                }
-            }));
-        }
-    });
-};
+exports.Book = Book;
