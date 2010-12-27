@@ -177,7 +177,7 @@ exports.annual_page_count = function(userid, callback) {
             console.log(err);
             callback("Could not get page count", 0);
             return;
-        } else if (_.isNull(reply)) {
+        } else if (_.isNull(reply) || reply.length == 0) {
             callback(null,0);
             return;
         }
@@ -225,13 +225,12 @@ exports.readings_for_user = function(userid, start, end, callback) {
     client.zrange(user_reading_set(userid),start,end, function(err,reply){
         var replies = 0;
         var readings = [];
-
         if (err) {
             console.log("Error:",err);
             callback(err,null);
             return;
         }
-        if (_.isNull(reply)) {
+        if (_.isNull(reply) || reply.length == 0) {
             console.log("user has not read any books");
             callback(null,readings);
             return;
