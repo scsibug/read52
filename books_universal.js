@@ -13,10 +13,11 @@ var bookincr = "book_incr";
 // Collection of all book keys, scores are created_date field
 var bookzset = "univ_book_zset";
 
-// Hash of EANs to book ID
-var bookeanzset = "ean_book_hash"
-// Hash of ASINs to book ID
-var bookeanzset = "asin_book_hash"
+// We want to be able to take an EAN or ASIN and get the book ID
+// combining these prefixes with the respective identifier and doing a
+// GET should return the book ID.
+var book_ean_prefix = "book:ean:"
+var book_asin_prefix = "book:asin:"
 
 // Keys for a book object that are eligible for serialization.
 var book_keys =
@@ -75,15 +76,88 @@ exports.create_from_search_term = function(term,callback) {
     if (search.type === "EAN") {
         exports.get_from_ean(search.value,callback);
     } else if (search.type === "ASIN") {
-        exports.get_from_asin(search.value,callback);
+        //exports.get_from_asin(search.value,callback);
+        callback("We do not support ASIN (Amazon) identifiers just yet...",null);
     } else {
         callback("Could not locate book",null);
     }
 };
 
-exports.get_from_ean = function(ean,callback) {
+// Get the key for a book object from its unique ID
+function id_to_key (id) {
+    return "book:id:"+id;
+};
+
+// Get an existing book via ID
+exports.get_from_id = function(id, callback) {
     
+}
+
+// Get an existing book via EAN
+exports.get_from_ean = function(ean,callback) {
+    // Find book ID
+var bookeanzset = "ean_book_hash"
+// Hash of ASINs to book ID
+var bookeanzset = "asin_book_hash"
 };
 
 exports.get_from_asin = function(asin,callback) {
 };
+
+function Book (attrs) {
+    var context = this;
+    context.load_from_json(attrs);
+    return context;
+}
+
+Book.prototype.load_from_json = function(json) {
+    var context = this;
+    _.select(reading_keys, function (key) {
+        context[key] = json[key];
+    });
+};
+
+// Save a book to redis
+Book.prototype.save = function save(callback) {
+    var client = rclient.getClient();
+    var context = this;
+    var obj_string = JSON.stringify(context);
+    client.set(id_to_key(context.id),obj_string, function(err,r) {
+        if (err) {
+            callback(err,null);
+        } else {
+            // callback when the book itself is saved
+            callback(err,context);
+            // update hash entries for ean/asin
+            context.update_indexes(null);
+        }
+    });
+    
+};
+
+
+Book.prototype.update_indexes = function(callback) {
+    var client = rclient.getClient();
+    // if EAN exists, use that and clear out other indexes.
+    // if ASIN exists, use that and clear out other indexes.
+var book_ean_prefix = "book:ean:"
+var book_asin_prefix = "book:asin:"
+    if (!_.isNull(this.ean) && (!_.isUndefined(this.ean))) {
+        client.set(book_ean_prefix+this.ean,this.id,callback);
+        client.hdel(book_asin_prefix+this.asin,this.asin,this.id,callback);
+    } else (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
+        client.hset(this.ean,this.id,callback);
+    }
+}
+
+Book.prototype.toJSON = function() {
+    var json = {};
+    var context = this;
+    _.select(reading_keys, function (key) {
+        json[key] = context[key];
+    });
+    return json;
+};
+
+
+exports.Book = Book;
