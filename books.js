@@ -145,21 +145,17 @@ exports.get_from_id = function(id, callback) {
         return;
     }
     var client = rclient.getClient();
-    console.log("getting id: ",id);
     var key = id_to_key(id);
-    console.log("getting key: ",key);
     client.get(id_to_key(id),function(err,val) {
         if (err) {
             console.log("Error retrieving book");
             callback(err,null);
         } else {
-            console.log("raw value",val);
             var parsed = JSON.parse(val);
-            console.log(sys.inspect(parsed));
             callback(err,new Book(JSON.parse(val)));
         }
     });
-}
+};
 
 // Get an existing book via URI
 exports.id_from_uri = function(uri,callback) {

@@ -97,7 +97,9 @@ exports.create = function(attrs, callback) {
 exports.get_by_book_id = function(userid, book_id, callback) {
     var client = rclient.getClient();
     var rkey = key_from_id(userid,book_id);
+    console.log("get",rkey);
     client.get(rkey,function(err,res) {
+        console.log("returns ",res);
         if (err) {
             console.log("Error: ",err);
             callback(err,null);
@@ -114,10 +116,10 @@ exports.get_by_book_id = function(userid, book_id, callback) {
             console.log("tried to parse",res);
         }
         var reading = new Reading(json);
-        (new books.Book(book_id,function(err,book) {
+        books.get_from_id(book_id,function(err,book) {
             reading.book = book;
             callback(err,reading);
-        }));
+        });
     });
 };
 
@@ -189,7 +191,7 @@ exports.annual_page_count = function(userid, callback) {
                 if (err && !_.isNull(reading)) {
                     console.log("Error loading reading, userid:",userid," book_id:",book_id);
                 } else {
-                    var pages = +reading.book.number_of_pages;
+                    var pages = +reading.book.pages;
                     if (_.isNumber(pages)) {
                         pagecount += pages;
                     }

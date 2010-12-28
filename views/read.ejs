@@ -18,7 +18,7 @@
 
 <div class="container">
 <div class="span-12">
-<img src="<%= reading.book.amz_img_large %>">
+<img src="<%= reading.book.cover_image_url_large %>">
 </div>
 
 <div class="span-12 last">
@@ -33,19 +33,19 @@
 <dt>EAN/ISBN-13</dt><dd><%= reading.ean %></dd>
 <% } %>
 
-<% if (reading.book.author) { %>
-<dt>Author</dt><dd><%= reading.book.author %></dd>
+<% if (reading.book.authors) { %>
+<dt>Author</dt><dd><%= reading.book.authors %></dd>
 <% } %>
 
-<% if (reading.book.dewey_decimal) { %>
-<dt>Dewey Decimal Number</dt><dd><%= reading.book.dewey_decimal %></dd>
+<% if (reading.book.dewey_decimal_number) { %>
+<dt>Dewey Decimal Number</dt><dd><%= reading.book.dewey_decimal_number %></dd>
 <% } %>
 
-<% if (reading.book.number_of_pages) { %>
-<dt>Pages</dt><dd><%= reading.book.number_of_pages %></dd>
+<% if (reading.book.pages) { %>
+<dt>Pages</dt><dd><%= reading.book.pages %></dd>
 <% } %>
 
-<dt>Details</dt><dd><a href="<%= reading.book.amz_detail_url %>">Amazon Page</a></dd>
+<dt>Details</dt><dd><a href="<%= reading.book.url %>">Amazon Page</a></dd>
 </dl>
 </div>
 </div>

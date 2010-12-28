@@ -72,8 +72,8 @@
     <% for (ix in readings) {
        reading = readings[ix];
      %>
-    <a href="/user/<%= pageuser.id %>/read/<%=reading.isbn%>">
-      <img src="<%= reading.book.amz_img_medium%>" title="<%= reading.book.title %>" alt="<%= reading.book.title%>" />
+    <a href="/user/<%= pageuser.id %>/read/<%=reading.book_id%>">
+      <img src="<%= reading.book.cover_image_url_medium%>" title="<%= reading.book.title %>" alt="<%= reading.book.title%>" />
     </a>
     <% } %>
   </div>

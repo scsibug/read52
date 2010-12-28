@@ -60,7 +60,7 @@ var process_amz_result = function(results) {
     ctx.ean = result.ItemAttributes.EAN;
     ctx.dewey_decimal_number = result.ItemAttributes.DeweyDecimalNumber;
     ctx.asin = result.ASIN;
-    ctx.author = result.ItemAttributes.Author;
+    ctx.authors = result.ItemAttributes.Author;
     ctx.isbn10 = result.ItemAttributes.ISBN;
     ctx.pages = result.ItemAttributes.NumberOfPages;
     if (!_.isUndefined(result.SmallImage)) {
