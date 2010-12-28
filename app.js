@@ -241,7 +241,6 @@ app.get('/user/:id/read/:bookid', function (req, res) {
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
     var completion_date = parseInt(req.body["completion-date"]);
-    console.log('submitted completion_date', completion_date);
     if (_.isNull(completion_date) || _.isNull(completion_date) || !_.isNumber(completion_date)) {
         completion_date = +new Date();
         console.log("set completion date to the current timestamp");
@@ -253,8 +252,10 @@ app.post('/user/:id/read', function (req, res) {
             res.send("Invalid Search Term",409);
             return;
         }
-        // get book
+        // get book (creating if necessary)
         books.create_from_identifier(term,function(err,book) {
+            console.log(book);
+            console.log(err);
             var book_id = book.id;
             readings.create(
                 {userid: req.params.id,
@@ -295,7 +296,7 @@ app.get('/book', function(req, res){
 
 // Get book information from amazon
 app.get('/book/:id', function(req, res) {
-    (new books.Book(req.params.id, function(err,b) {
+    books.get_from_id(req.params.id, function(err,b) {
         res.render('book', {
             locals: { title: ("Info for "+b.title),
                       book: b,
@@ -303,7 +304,7 @@ app.get('/book/:id', function(req, res) {
                       user: req.getAuthDetails().user
                     }
         });
-    }));
+    });
 });
 
 // Raw book information (mostly for debugging at the moment)

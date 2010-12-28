@@ -3,7 +3,7 @@
 </div>
 
 <div class="span-12">
-<img src="<%= book.amz_img_large %>">
+<img src="<%= book.cover_image_url_large %>">
 </div>
 
 <div class="span-12 last">
@@ -15,17 +15,17 @@
 <% } %>
 
 <% if (book.author) { %>
-<dt>Author</dt><dd><%= book.author %></dd>
+<dt>Author</dt><dd><%= book.authors %></dd>
 <% } %>
 
 <% if (book.dewey_decimal) { %>
-<dt>Dewey Decimal Number</dt><dd><%= book.dewey_decimal %></dd>
+<dt>Dewey Decimal Number</dt><dd><%= book.dewey_decimal_number %></dd>
 <% } %>
 
 <% if (book.number_of_pages) { %>
-<dt>Pages</dt><dd><%= book.number_of_pages %></dd>
+<dt>Pages</dt><dd><%= book.pages %></dd>
 <% } %>
 
-<dt>Details</dt><dd><a href="<%= book.amz_detail_url %>">Amazon Page</a></dd>
+<dt>Details</dt><dd><a href="<%= book.url %>">Amazon Page</a></dd>
 </dl>
 </div>

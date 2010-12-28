@@ -6,6 +6,7 @@ var strings = require('./lib/underscore.strings');
 _.mixin(_s); // extend underscore with strings
 var rclient = require('./redisclient');
 var isbn = require('./isbn');
+var book_lookup = require('./book_lookup');
 
 // Each book-thing gets a unique number
 var bookincr = "book:incr";
@@ -91,24 +92,37 @@ exports.isASINlike = function isASINlike(asin) {
 // Create a book from URI
 // callback will be invoked with error,book
 exports.create_from_identifier = function(term,callback) {
+    console.log("creating from search term",term);
     var search = exports.detect_search_type(term);
+    console.log("search term detected as",sys.inspect(search));
     var uri = search.uri;
     if (!_.isNull(uri)) {
+        console.log("URI is null");
         // Find existing book
         exports.id_from_uri(uri,function(err,result) {
             if (err) {
+                console.log(err);
                 callback("Error finding book ID",null);
             } else if (_.isNull(result)) {
+                console.log("Book was not found, looking up");
                 // if book not found, send URI to book lookup service
-                book_lookup.lookup(search.type,uri, function(err,lookup_book) {
+                book_lookup.lookup(search.type, search.value, function(err,lookup_book) {
+                    console.log("book_lookup.lookup callback returned");
                     var b = new Book(lookup_book);
-                    b.save(function() {
-                        callback(null,b);
+                    make_book_id(function(err,book_id) {
+                        if (err) {
+                            console.log("make_book_id failed",err);
+                            callback("Could not create unique identifier for book",null);
+                        }
+                        b.id = book_id
+                        b.save(function() {
+                            callback(null,b);
+                        });
                     });
                 });
-                callback("Book could not be found",null);
             } else {
                 // book already exists
+                console.log("book already exists, using get_from_id to retrieve");
                 exports.get_from_id(result,callback);
             }
         });
@@ -125,8 +139,26 @@ function id_to_key (id) {
 
 // Get an existing book via ID
 exports.get_from_id = function(id, callback) {
+    if (_.isNull(id) || _.isUndefined(id)) {
+        console.log("Cannot get book with ID of null/undefined");
+        callback("ID was null/undefined",null);
+        return;
+    }
+    var client = rclient.getClient();
+    console.log("getting id: ",id);
     var key = id_to_key(id);
-    console.log("getting key",key);
+    console.log("getting key: ",key);
+    client.get(id_to_key(id),function(err,val) {
+        if (err) {
+            console.log("Error retrieving book");
+            callback(err,null);
+        } else {
+            console.log("raw value",val);
+            var parsed = JSON.parse(val);
+            console.log(sys.inspect(parsed));
+            callback(err,new Book(JSON.parse(val)));
+        }
+    });
 }
 
 // Get an existing book via URI
@@ -148,19 +180,36 @@ Book.prototype.load_from_json = function(json) {
     });
 };
 
+// Create a unique identifier for a book
+var make_book_id = function(callback) {
+    var client = rclient.getClient();
+    client.incr(bookincr,callback);
+}
+
 // Save a book to redis
-// this writes JSON to the :info key, and updates the
+// this writes JSON to the :info key,
+// adds book to book sorted set, and updates the
 // hash that points URIs to the book ID.
 Book.prototype.save = function save(callback) {
     var client = rclient.getClient();
     var context = this;
     var obj_string = JSON.stringify(context);
+    // if the book does not have an ID, die
+    if (_.isUndefined(context.id) || _.isNull(context.id)) {
+        console.log("This book does not have an identifier");
+        callback("Book must have a unique identifier created before saving",null);
+    }
     client.set(id_to_key(context.id),obj_string, function(err,r) {
         if (err) {
             callback(err,null);
         } else {
-            // callback when the book itself is saved
-            callback(err,context);
+            // add to list of books, ordered by book id
+            client.zadd(bookzset,context.id,context.id,function(err,result) {
+                if (err) {
+                    console.log(err);
+                }
+                callback(err,context);             
+            });
             // update hash entries for ean/asin
             context.update_indexes(null);
         }
@@ -187,10 +236,48 @@ Book.prototype.update_indexes = function(callback) {
 Book.prototype.toJSON = function() {
     var json = {};
     var context = this;
-    _.select(reading_keys, function (key) {
+    _.select(book_keys, function (key) {
         json[key] = context[key];
     });
     return json;
+};
+
+// How many books exist in the DB?
+exports.book_count = function(callback) {
+    var client = rclient.getClient();
+    client.zcard(bookzset,callback);
+};
+
+exports.list_books = function(start, end, callback) {
+    var client = rclient.getClient();
+    client.zrange(bookzset,start,end, function(err,reply){
+        var replies = 0;
+        var books = [];
+        if (_.isNull(reply)) {
+            if (err) {
+                console.log("Error:",err);
+            }
+            callback(err,books);
+            return;
+        }
+        if (reply.length === 0) {
+            callback(null,books);
+        }
+        for(var i=0; i < reply.length; i++) {
+            // each reply is a book ID
+            exports.get_from_id(reply[i].toString(), function(err,book) {
+                if (err) {
+                    console.log("error retrieving book");
+                } else {
+                    books.push(book);
+                }
+                replies++;
+                if (replies == reply.length) {
+                    callback(err,books);
+                }
+            });
+        }
+    });
 };
 
 exports.Book = Book;

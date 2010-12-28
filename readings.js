@@ -77,14 +77,14 @@ exports.create = function(attrs, callback) {
         attrs.completion_date = +new Date();
     }
     attrs.rating = exports.clean_rating(attrs.rating);
-    var reading_id = key_from_id(attrs.userid,attrs.isbn);
-    // Ensure there isn't an existing reading for this user/ISBN combination
-    exports.reading_exists(attrs.userid,attrs.isbn,function(err,res) {
+    var reading_id = key_from_id(attrs.userid,attrs.book_id);
+    // Ensure there isn't an existing reading for this user/book combination
+    exports.reading_exists(attrs.userid,attrs.book_id,function(err,res) {
         if (!err && !res) {
             var reading = new Reading(attrs);
-            set_add_reading(attrs.userid,+(attrs.completion_date),attrs.isbn,function (err,res) {
+            set_add_reading(attrs.userid,+(attrs.completion_date),attrs.book_id,function (err,res) {
                 reading.save(function (err,res) {
-                    actions.publish_action(attrs.userid,"read " + attrs.isbn + " on " + attrs.completion_date);
+                    actions.publish_action(attrs.userid,"read " + attrs.book_id + " on " + attrs.completion_date);
                     callback(err,res);
                 });
             });
@@ -141,8 +141,9 @@ Reading.prototype.get_rating = function get_rating() {
 Reading.prototype.save = function save(callback) {
     var client = rclient.getClient();
     var context = this;
+    context.modified_date = +new Date();
     var obj_string = JSON.stringify(context);
-    client.set(key_from_id(context.userid,context.isbn),obj_string, function(err,r) {
+    client.set(key_from_id(context.userid,context.book_id),obj_string, function(err,r) {
         if (err) {
             callback(err,null);
         } else {
