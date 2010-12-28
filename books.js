@@ -105,10 +105,14 @@ function id_to_key (id) {
 
 // Get an existing book via ID
 exports.get_from_id = function(id, callback) {
+    var key = id_to_key(id);
+    console.log("getting key",key);
 }
 
-// Get an existing book via EAN
-exports.get_from_uri = function(ean,callback) {
+// Get an existing book via URI
+exports.id_from_uri = function(uri,callback) {
+    var client = rclient.getClient();
+    client.hget(book_uri_hash,uri,callback);
 };
 
 function Book (attrs) {
@@ -136,7 +140,7 @@ Book.prototype.save = function save(callback) {
             // callback when the book itself is saved
             callback(err,context);
             // update hash entries for ean/asin
-            context.update_indexes();
+            context.update_indexes(null);
         }
     });
 };
@@ -147,7 +151,7 @@ Book.prototype.update_indexes = function(callback) {
     var notify = function(err,result) {
         actions_complete++;
         if (actions_complete == actions_total) {
-            if (!.isNull(callback)) callback();
+            if (!_.isNull(callback)) callback();
         }
     }
     if (!_.isNull(this.ean) && (!_.isUndefined(this.ean))) {
