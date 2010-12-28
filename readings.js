@@ -8,14 +8,14 @@ var actions = require('./actions');
 var books = require('./books');
 
 // Keys that are specific to a reading object, that should be serialized/deserialized
-var reading_keys = ["userid", "isbn", "comment", "rating", "completion_date", "creation_date"];
+var reading_keys = ["userid", "book_id", "comment", "rating", "completion_date", "creation_date"];
 
 var user_reading_set = function(user_id) {
     return("user:"+user_id+":reading_set");
 };
 
-var key_from_id = function (user_id,ean) {
-    return("user:"+user_id+":reading_isbn:"+ean);
+var key_from_id = function (user_id,book_id) {
+    return("user:"+user_id+":reading_id:"+book_id);
 };
 
 // Add (or update) a reading.  read_date argument is standard javascript date (millis since epoch)
@@ -29,9 +29,9 @@ var set_remove_reading = function(user_id, reading_key, callback) {
     client.zrem(user_reading_set(user_id), reading_key, callback);
 };
 
-exports.reading_exists = function(user_id,ean,callback) {
+exports.reading_exists = function(user_id,book_id,callback) {
     var client = rclient.getClient();
-    var reading_id = key_from_id(user_id,ean);
+    var reading_id = key_from_id(user_id,book_id);
     client.exists(reading_id,function(err,res) {
         if (err) {
             console.log("Error:",err);
@@ -94,9 +94,9 @@ exports.create = function(attrs, callback) {
     });
 };
 
-exports.get_by_ean = function(userid, ean, callback) {
+exports.get_by_book_id = function(userid, book_id, callback) {
     var client = rclient.getClient();
-    var rkey = key_from_id(userid,ean);
+    var rkey = key_from_id(userid,book_id);
     client.get(rkey,function(err,res) {
         if (err) {
             console.log("Error: ",err);
@@ -114,7 +114,7 @@ exports.get_by_ean = function(userid, ean, callback) {
             console.log("tried to parse",res);
         }
         var reading = new Reading(json);
-        (new books.Book(ean,function(err,book) {
+        (new books.Book(book_id,function(err,book) {
             reading.book = book;
             callback(err,reading);
         }));
@@ -182,11 +182,11 @@ exports.annual_page_count = function(userid, callback) {
             return;
         }
         for(var i=0; i < reply.length; i++) {
-            var ean = reply[i].toString();
-            exports.get_by_ean(userid,ean,function(err,reading) {
+            var book_id = reply[i].toString();
+            exports.get_by_book_id(userid,book_id,function(err,reading) {
                 replies++;
                 if (err && !_.isNull(reading)) {
-                    console.log("Error loading reading, userid:",userid," ean:",ean);
+                    console.log("Error loading reading, userid:",userid," book_id:",book_id);
                 } else {
                     var pages = +reading.book.number_of_pages;
                     if (_.isNumber(pages)) {
@@ -236,10 +236,10 @@ exports.readings_for_user = function(userid, start, end, callback) {
             return;
         }
         for(var i=0; i < reply.length; i++) {
-            var ean = reply[i].toString();
-            exports.get_by_ean(userid,ean,function(err,reading) {
+            var book_id = reply[i].toString();
+            exports.get_by_book_id(userid,book_id,function(err,reading) {
                 if (err) {
-                    console.log("Error loading reading, userid:",userid," ean:",ean);
+                    console.log("Error loading reading, userid:",userid," book_id:",book_id);
                 } else {
                     readings.push(reading);
                 }
