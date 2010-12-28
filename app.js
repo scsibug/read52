@@ -195,6 +195,7 @@ app.get('/user/:id/export', function (req, res) {
 });
 
 // Bulk import user data
+// TODO: make this work with ISBN/EAN/ASIN instead of non-portable book IDs
 app.post('/user/:id/import', function (req, res) {
     if (authzUser(req,req.params.id)) {
         var importjson = JSON.parse(req.rawBody);
@@ -204,11 +205,11 @@ app.post('/user/:id/import', function (req, res) {
         _.each(importjson,function(elem, index, list) {
             var r = {};
             r.userid = req.params.id;
-            r.isbn = elem.isbn;
+            r.book_id = elem.book_id;
             r.completion_date = elem.completion_date;
             r.rating = elem.rating;
             r.comment = elem.comment;
-            readings.create(r,function() {console.log("created reading for",r.isbn)});
+            readings.create(r,function() {console.log("created reading for",r.book_id)});
             console.log("working on",elem);
         });
     } else {
@@ -217,13 +218,13 @@ app.post('/user/:id/import', function (req, res) {
     }
 });
 
-app.get('/user/:id/read/:ean', function (req, res) {
+app.get('/user/:id/read/:bookid', function (req, res) {
     users.get_by_id(req.params.id, function(err, pageuser) {
         if (err) {
             console.log(err);
             res.redirect('/');
         }
-        readings.get_by_ean(req.params.id, req.params.ean, function(err,r) {
+        readings.get_by_book_id(req.params.id, req.params.bookid, function(err,r) {
             res.render('read', {
                 locals: { reading: r,
                           title: r.book.title,
@@ -246,24 +247,25 @@ app.post('/user/:id/read', function (req, res) {
         console.log("set completion date to the current timestamp");
     }
     if (authzUser(req,req.params.id)) {
-        var ean = isbn.to_isbn_13(req.body.isbn);
-        if (_.isNull(ean)) {
-            console.log("ISBN/EAN is not valid");
-            res.send("Invalid ISBN",409);
+        var term = req.body.searchterm;
+        if (_.isNull(term)) {
+            console.log("Book search term is not valid");
+            res.send("Invalid Search Term",409);
             return;
         }
-        readings.create(
-            {userid: req.params.id,
-             isbn: ean,
-             comment: req.body.comment,
-             rating: req.body.rating,
-             completion_date: completion_date
-            },function(err,reading) {
-                // Create book, if necessary
-                books.get_book(ean,function(err,book) {
-                    res.redirect('/user/'+req.params.id+'/read/'+ean);
+        // get book
+        books.create_from_identifier(term,function(err,book) {
+            var book_id = book.id;
+            readings.create(
+                {userid: req.params.id,
+                 book_id: book_id,
+                 comment: req.body.comment,
+                 rating: req.body.rating,
+                 completion_date: completion_date},
+                function(err,reading) {
+                    res.redirect('/user/'+req.params.id+'/read/'+book_id)
                 });
-            });
+        });        
     } else {
         console.log("Unauthorized POST against user",req.params.id);
         res.send("Not authorized",401);
@@ -328,7 +330,7 @@ app.post('/book/:id/update', function(req, res) {
     console.log("Forcing an update of ",req.params.id," via AWS");
     books.save_book(req.params.id,function() {
         (new books.Book(req.params.id, function(err,b) {
-            res.redirect('/book/'+b.ean, 200);
+            res.redirect('/book/'+b.id, 200);
         }));
     });
 });

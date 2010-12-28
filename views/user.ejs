@@ -26,8 +26,8 @@
 
     <form id="add-book-form" action="/user/<%= user.id %>/read" method="post">
       <div class="span-12">
-        <label for="isbn">ISBN</label><br />
-        <input id="isbn" type="text" class="title" name="isbn" /> <br />
+    <label for="searchterm">Book Identifier (ISBN, EAN, or ASIN)</label><br />
+        <input id="searchterm" type="text" class="title" name="searchterm" /> <br />
         Rating:<br />
                             <input class="star {split:4}" type="radio" name="rating" value="5"/>
                             <input class="star {split:4}" type="radio" name="rating" value="10"/>
