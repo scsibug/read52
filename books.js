@@ -56,9 +56,10 @@ exports.asin_to_uri = function(asin) {
 
 // Detect what our search term contains.
 // Returns either "EAN", "ASIN", or "unknown"
-// Return an object with type/value attributes:
+// Return an object with type/value/uri attributes:
 //  type is "EAN", "ASIN", or "unknown".
 //  value will be the "sanitized" term.
+//  uri is formed from the value.
 exports.detect_search_type = function (search) {
     var result = {}
     var search = _.trim(search);
@@ -66,12 +67,15 @@ exports.detect_search_type = function (search) {
     if (!_.isNull(ean)) {
         result.type="EAN";
         result.value=ean
+        result.uri=exports.isbn_to_uri(ean);
     } else if (exports.isASINlike(search)) {
         result.type="ASIN";
         result.value=search;
+        result.uri=exports.asin_to_uri(search);
     } else {
         result.type="unknown";
         result.value=search;
+        result.uri=null;
     }
     return result;
 };
@@ -84,17 +88,32 @@ exports.isASINlike = function isASINlike(asin) {
     return re.test(asin);
 };
 
-// Create a book from a search term.
-// callback will be called with error+book
-exports.create_from_search_term = function(term,callback) {
+// Create a book from URI
+// callback will be invoked with error,book
+exports.create_from_identifier = function(term,callback) {
     var search = exports.detect_search_type(term);
-    if (search.type === "EAN") {
-        exports.get_from_ean(search.value,callback);
-    } else if (search.type === "ASIN") {
-        //exports.get_from_asin(search.value,callback);
-        callback("We do not support ASIN (Amazon) identifiers just yet...",null);
+    var uri = search.uri;
+    if (!_.isNull(uri)) {
+        // Find existing book
+        exports.id_from_uri(uri,function(err,result) {
+            if (err) {
+                callback("Error finding book ID",null);
+            } else if (_.isNull(result)) {
+                // if book not found, send URI to book lookup service
+                book_lookup.lookup(search.type,uri, function(err,lookup_book) {
+                    var b = new Book(lookup_book);
+                    b.save();
+                    callback(null,b);
+                });
+                callback("Book could not be found",null);
+            } else {
+                // book already exists
+                exports.get_from_id(result,callback);
+            }
+        });
     } else {
-        callback("Could not locate book",null);
+        // error out... book URI couldn't be determined
+        callback("Book must be identified by an ISBN or Amazon ASIN.",null);
     }
 };
 
@@ -123,12 +142,14 @@ function Book (attrs) {
 
 Book.prototype.load_from_json = function(json) {
     var context = this;
-    _.select(reading_keys, function (key) {
+    _.select(book_keys, function (key) {
         context[key] = json[key];
     });
 };
 
 // Save a book to redis
+// this writes JSON to the :info key, and updates the
+// hash that points URIs to the book ID.
 Book.prototype.save = function save(callback) {
     var client = rclient.getClient();
     var context = this;
