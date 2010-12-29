@@ -170,7 +170,7 @@ Reading.prototype.save = function save(callback) {
 
 // Redis key for this reading
 Reading.prototype.key = function key() {
-    return key_from_id(this.userid.this.book_id);
+    return key_from_id(this.userid,this.book_id);
 };
 
 // Remove a reading, without having to retrieve it first
