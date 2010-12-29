@@ -10,7 +10,7 @@
 
 <% if(userIsHome) { %>
 <div class="prepend-4 span-8 last">
-  <h2><a href="#" onclick="$('#add-book').fadeIn()">Add Book</a></h2>
+  <h2><a href="#" onclick="$('#add-book').toggle()">Add Book</a></h2>
 </div>
 <% } %>
 
@@ -28,7 +28,7 @@
       <div class="span-12">
     <label for="searchterm">Book Identifier (ISBN, EAN, or ASIN)</label><br />
         <input id="searchterm" type="text" class="title" name="searchterm" /> <br />
-        Rating:<br />
+        <label>Rating</label><br />
                             <input class="star {split:4}" type="radio" name="rating" value="5"/>
                             <input class="star {split:4}" type="radio" name="rating" value="10"/>
                             <input class="star {split:4}" type="radio" name="rating" value="15"/>
@@ -49,7 +49,9 @@
                             <input class="star {split:4}" type="radio" name="rating" value="90"/>
                             <input class="star {split:4}" type="radio" name="rating" value="95"/>
                             <input class="star {split:4}" type="radio" name="rating" value="100"/>
-
+                              <br />
+       <label for="comment">Comment</label><br />
+       <textarea id="comment" type="text" name="comment" rows="4"></textarea>
       </div>
       <div class="span-12 last">
         <label for="completion-date">Date Finished</label><br />

@@ -68,4 +68,15 @@ p.elab
 { 
   display: none
 }
+
+.comment
+{ 
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  display: block;
+  margin-bottom: 0.5em;
+  padding: 3px;
+  background: #ddf;
+}
+
 /*******************************/
