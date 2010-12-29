@@ -73,10 +73,10 @@ p.elab
 { 
   -moz-border-radius: 3px;
   border-radius: 3px;
+  border: 2px solid #ccc;
   display: block;
   margin-bottom: 0.5em;
   padding: 3px;
-  background: #ddf;
 }
 
 /*******************************/

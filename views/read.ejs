@@ -47,7 +47,10 @@
 
 <dt>Details</dt><dd><a href="<%= reading.book.url %>">Amazon Page</a></dd>
 </dl>
+
 <% if (reading.comment) { %>
+<hr />
+<h3 class="alt">Comment</h3>
 <div id="reading_comment" class="comment">
 <%= reading.comment %>
 </div>
