@@ -84,8 +84,13 @@ exports.create = function(attrs, callback) {
             var reading = new Reading(attrs);
             set_add_reading(attrs.userid,+(attrs.completion_date),attrs.book_id,function (err,res) {
                 reading.save(function (err,res) {
-                    actions.publish_action(attrs.userid,"read " + attrs.book_id + " on " + attrs.completion_date);
                     callback(err,res);
+                    // after save, publish action with user name and book title
+                    books.get_from_id(attrs.book_id,function(err,book) {
+                        if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
+                            actions.publish_action(attrs.userid,"read " + book.title)
+                        }
+                    });
                 });
             });
         } else {
