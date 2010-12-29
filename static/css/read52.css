@@ -5,6 +5,8 @@ body
 
 .container
 { 
+  -moz-border-radius: 6px;
+  border-radius: 6px;
   padding-left:10px;
   padding-right:10px;
   margin-left:30px;
