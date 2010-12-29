@@ -23,12 +23,16 @@ lookup_unthrottled = function(idtype, id, callback) {
         console.log("lookup on null id type");
         callback("Null ID type", null);
     }
-    opHelper.execute('ItemLookup', {
-        'SearchIndex': 'Books',
+    var lookupquery = {
         'IdType': idtype,
         'ItemId': id,
         'ResponseGroup': 'ItemAttributes,Images'
-    }, function(error, results) {
+    };
+    if (idtype!=='ASIN') {
+        // SearchIndex is not valid for ASIN
+        lookupquery.SearchIndex = 'Books';
+    }
+    opHelper.execute('ItemLookup', lookupquery, function(error, results) {
         if (error) { console.log("Error:",error); }
         var amz_res = process_amz_result(results);
         if (_.isNull(amz_res)) {
