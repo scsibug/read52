@@ -274,6 +274,21 @@ app.post('/user/:id/read', function (req, res) {
     }
 });
 
+// Remove a reading
+app.post('/user/:id/read/:bookid/remove', function (req, res) {
+    if (authzUser(req,req.params.id)) {
+        readings.remove(req.params.id,req.params.bookid,function(err,res) {
+            if (err) {
+                console.log("Error removing reading",err);
+            }
+            res.redirect('/user/'+req.params.id);
+        });
+    } else {
+        console.log("Unauthorized POST against user",req.params.id);
+        res.send("Not authorized",401);
+    }
+});
+
 // Update a book that a user has read
 app.post('/user/:id/read/:bookid', function (req, res) {
     if (authzUser(req,req.params.id)) {

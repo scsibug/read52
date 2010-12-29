@@ -19,14 +19,14 @@ var key_from_id = function (user_id,book_id) {
 };
 
 // Add (or update) a reading.  read_date argument is standard javascript date (millis since epoch)
-var set_add_reading = function(user_id, read_date, reading_key, callback) {
+var set_add_reading = function(user_id, read_date, book_id, callback) {
     var client = rclient.getClient();
-    client.zadd(user_reading_set(user_id), read_date, reading_key, callback);
+    client.zadd(user_reading_set(user_id), read_date, book_id, callback);
 };
 
-var set_remove_reading = function(user_id, reading_key, callback) {
+var set_remove_reading = function(user_id, book_id, callback) {
     var client = rclient.getClient();
-    client.zrem(user_reading_set(user_id), reading_key, callback);
+    client.zrem(user_reading_set(user_id), book_id, callback);
 };
 
 exports.reading_exists = function(user_id,book_id,callback) {
@@ -151,7 +151,7 @@ Reading.prototype.save = function save(callback) {
     var context = this;
     context.modified_date = +new Date();
     var obj_string = JSON.stringify(context);
-    client.set(key_from_id(context.userid,context.book_id),obj_string, function(err,r) {
+    client.set(context.key(), obj_string, function(err,r) {
         if (err) {
             callback(err,null);
         } else {
@@ -164,6 +164,33 @@ Reading.prototype.save = function save(callback) {
                     callback(err,context);
                 }
             });
+        }
+    });
+};
+
+// Redis key for this reading
+Reading.prototype.key = function key() {
+    return key_from_id(this.userid.this.book_id);
+};
+
+// Remove a reading, without having to retrieve it first
+exports.remove = function remove_reading(userid, bookid, callback) {
+    var reading = new Reading({userid: userid, book_id: bookid});
+    reading.remove(callback);
+}
+
+// Remove a reading and associated entries in indices
+Reading.prototype.remove = function remove(callback) {
+    var client = rclient.getClient();
+    var context = this;
+    client.del(context.key(),function(err,res) {
+        if (err) {
+            console.log("Error deleting reading key",err);
+        }
+    });
+    set_remove_reading(context.userid, context.book_id, function(err,res) {
+        if (err) {
+            console.log("Error deleting reading key",err);
         }
     });
 };
