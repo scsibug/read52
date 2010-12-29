@@ -6,6 +6,12 @@
  * Licensed Under GPL version 2 license.
  *
  */
+
+/**
+ *  Modifications to support more advanced 'onclick'-like handlers passed in through yesFunction.
+ *  Greg Heartsfield <scsibug@imap.cc> 12-29-10
+ */
+
 (function($){
 
 	jQuery.fn.jConfirmAction = function (options) {
@@ -15,9 +21,11 @@
 		// yesAnswer : a text for Yes answer.
 		// cancelAnswer : a text for Cancel/No answer.
 		var theOptions = jQuery.extend ({
-			question: "Are You Sure ?",
-			yesAnswer: "Yes",
-			cancelAnswer: "Cancel"
+		    question: "Are You Sure ?",
+		    yesAnswer: "Yes",
+      		    cancelAnswer: "Cancel",
+                    yesFunction: null,
+                    cancelFunction: null
 		}, options);
 		
 		return this.each (function () {
@@ -26,7 +34,7 @@
 
 				e.preventDefault();
 				thisHref	= $(this).attr('href');
-				
+
 				if($(this).next('.question').length <= 0)
 					$(this).after('<div class="question">'+theOptions.question+'<br/> <span class="yes">'+theOptions.yesAnswer+'</span><span class="cancel">'+theOptions.cancelAnswer+'</span></div>');
 				
@@ -34,11 +42,15 @@
 				
 				$('.yes').bind('click', function(){
 					window.location = thisHref;
+                                    if (theOptions.yesFunction)
+                                        theOptions.yesFunction();
 				});
 		
 				$('.cancel').bind('click', function(){
 					$(this).parents('.question').fadeOut(300, function() {
-						$(this).remove();
+                                            if (theOptions.cancelFunction)
+                                                theOptions.cancelFunction();
+					    $(this).remove();
 					});
 				});
 				
