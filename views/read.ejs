@@ -10,10 +10,15 @@
 </div>
 
 <% if(userIsHome) { %>
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+  $('#delete-reading').jConfirmAction();
+});
+</script>
 <div id="subnav" class="prepend-2 span-6 last">
 <ul>
 <li><a href="#" onclick="$('#edit-book').toggle('fast')">Edit</a></li>
-<li><a href="#">Delete</a></li>
+<li><a id="delete-reading" href="#">Delete</a></li>
 </ul>
 </div>
 <% } %>
