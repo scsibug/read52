@@ -92,22 +92,18 @@ exports.isASINlike = function isASINlike(asin) {
 // Create a book from URI
 // callback will be invoked with error,book
 exports.create_from_identifier = function(term,callback) {
-    console.log("creating from search term",term);
     var search = exports.detect_search_type(term);
     console.log("search term detected as",sys.inspect(search));
     var uri = search.uri;
     if (!_.isNull(uri)) {
-        console.log("URI is null");
         // Find existing book
         exports.id_from_uri(uri,function(err,result) {
             if (err) {
                 console.log(err);
                 callback("Error finding book ID",null);
             } else if (_.isNull(result)) {
-                console.log("Book was not found, looking up");
                 // if book not found, send URI to book lookup service
                 book_lookup.lookup(search.type, search.value, function(err,lookup_book) {
-                    console.log("book_lookup.lookup callback returned");
                     var b = new Book(lookup_book);
                     make_book_id(function(err,book_id) {
                         if (err) {
@@ -122,8 +118,7 @@ exports.create_from_identifier = function(term,callback) {
                 });
             } else {
                 // book already exists
-                console.log("book already exists, using get_from_id to retrieve");
-                exports.get_from_id(result,callback);
+                exports.get_by_id(result,callback);
             }
         });
     } else {
@@ -138,7 +133,7 @@ function id_to_key (id) {
 };
 
 // Get an existing book via ID
-exports.get_from_id = function(id, callback) {
+exports.get_by_id = function(id, callback) {
     if (_.isNull(id) || _.isUndefined(id)) {
         console.log("Cannot get book with ID of null/undefined");
         callback("ID was null/undefined",null);
@@ -261,7 +256,7 @@ exports.list_books = function(start, end, callback) {
         }
         for(var i=0; i < reply.length; i++) {
             // each reply is a book ID
-            exports.get_from_id(reply[i].toString(), function(err,book) {
+            exports.get_by_id(reply[i].toString(), function(err,book) {
                 if (err) {
                     console.log("error retrieving book");
                 } else {

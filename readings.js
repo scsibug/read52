@@ -86,7 +86,7 @@ exports.create = function(attrs, callback) {
                 reading.save(function (err,res) {
                     callback(err,res);
                     // after save, publish action with user name and book title
-                    books.get_from_id(attrs.book_id,function(err,book) {
+                    books.get_by_id(attrs.book_id,function(err,book) {
                         if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
                             actions.publish_action(attrs.userid,"read " + book.title)
                         }
@@ -121,7 +121,7 @@ exports.get_by_book_id = function(userid, book_id, callback) {
             console.log("tried to parse",res);
         }
         var reading = new Reading(json);
-        books.get_from_id(book_id,function(err,book) {
+        books.get_by_id(book_id,function(err,book) {
             reading.book = book;
             callback(err,reading);
         });

@@ -296,7 +296,7 @@ app.get('/book', function(req, res){
 
 // Get book information from amazon
 app.get('/book/:id', function(req, res) {
-    books.get_from_id(req.params.id, function(err,b) {
+    books.get_by_id(req.params.id, function(err,b) {
         res.render('book', {
             locals: { title: ("Info for "+b.title),
                       book: b,
