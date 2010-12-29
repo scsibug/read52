@@ -76,6 +76,9 @@ exports.create = function(attrs, callback) {
     if (!_.isNumber(attrs.completion_date)) {
         attrs.completion_date = +new Date();
     }
+    if (_.isUndefined(attrs.comment)) {
+        attrs.comment = "";
+    }
     attrs.rating = exports.clean_rating(attrs.rating);
     var reading_id = key_from_id(attrs.userid,attrs.book_id);
     // Ensure there isn't an existing reading for this user/book combination

@@ -238,6 +238,7 @@ app.get('/user/:id/read/:bookid', function (req, res) {
     });
 });
 
+
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
     var completion_date = parseInt(req.body["completion-date"]);
@@ -264,9 +265,35 @@ app.post('/user/:id/read', function (req, res) {
                  rating: req.body.rating,
                  completion_date: completion_date},
                 function(err,reading) {
-                    res.redirect('/user/'+req.params.id+'/read/'+book_id)
+                    res.redirect('/user/'+req.params.id+'/read/'+book_id);
                 });
         });        
+    } else {
+        console.log("Unauthorized POST against user",req.params.id);
+        res.send("Not authorized",401);
+    }
+});
+
+// Update a book that a user has read
+app.post('/user/:id/read/:bookid', function (req, res) {
+    if (authzUser(req,req.params.id)) {
+        // lookup the existing reading
+        readings.get_by_book_id(req.params.id,req.params.bookid,function(err,reading) {
+            if (err) {
+                console.log("Error updating reading",err);
+            }
+            // Update fields from form
+            reading.comment = req.body["comment"];
+            reading.rating = req.body.rating;
+            reading.completion_date = parseInt(req.body["completion-date"]);
+            // Save the updated reading entry
+            reading.save(function(err,newreading) {
+                if (!err) {
+                    console.log("Save successful");
+                }
+                res.redirect('/user/'+req.params.id+'/read/'+req.params.bookid);
+            });
+        });
     } else {
         console.log("Unauthorized POST against user",req.params.id);
         res.send("Not authorized",401);
