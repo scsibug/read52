@@ -66,6 +66,32 @@ p.elab
   background: #555;
   color: white;
 }
+
+/***** Buttons Submenu******/
+#subnav ul
+{
+  float: right;
+}
+
+#subnav ul li
+{
+  display: inline;
+  float: left;
+  margin: 0px 0px 0x 0x;
+  background: #555;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#subnav ul li a
+{
+  background: #555;
+  color: white;
+}
+/***************************/
+
 .hidden
 { 
   display: none

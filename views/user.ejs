@@ -4,13 +4,15 @@
   });
 </script>
 
-<div class="span-12">
+<div class="span-16">
    <h1><%= pageuser.name %></h1>
 </div>
 
 <% if(userIsHome) { %>
-<div class="prepend-4 span-8 last">
-  <h2><a href="#" onclick="$('#add-book').toggle('fast')">Add Book</a></h2>
+<div id="subnav" class="prepend-2 span-6 last">
+<ul>
+<li><a href="#" onclick="$('#add-book').toggle('fast')">Add Book</a></li>
+</ul>
 </div>
 <% } %>
 

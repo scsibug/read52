@@ -10,8 +10,11 @@
 </div>
 
 <% if(userIsHome) { %>
-<div class="prepend-2 span-6 last">
-  <h2><a href="#" onclick="$('#edit-book').toggle('fast')">Edit</a></h2>
+<div id="subnav" class="prepend-2 span-6 last">
+<ul>
+<li><a href="#" onclick="$('#edit-book').toggle('fast')">Edit</a></li>
+<li><a href="#">Delete</a></li>
+</ul>
 </div>
 <% } %>
 
