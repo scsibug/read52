@@ -225,15 +225,23 @@ app.get('/user/:id/read/:bookid', function (req, res) {
             res.redirect('/');
         }
         readings.get_by_book_id(req.params.id, req.params.bookid, function(err,r) {
-            res.render('read', {
-                locals: { reading: r,
-                          title: r.book.title,
-                          nav: "books",
-                          userIsHome: authzUser(req,req.params.id),
-                          pageuser: pageuser,
-                          user: req.getAuthDetails().user
-                        }
-            });
+            if (err) {
+                console.log("Error:",err);
+                res.redirect('/');
+            } else if (_.isNull(r)) {
+                console.log("Request for a reading that does not exist");
+                res.send("This user has not read that book.", 404);                
+            } else {
+                res.render('read', {
+                    locals: { reading: r,
+                              title: r.book.title,
+                              nav: "books",
+                              userIsHome: authzUser(req,req.params.id),
+                              pageuser: pageuser,
+                              user: req.getAuthDetails().user
+                            }
+                });
+            }
         });
     });
 });
@@ -276,11 +284,15 @@ app.post('/user/:id/read', function (req, res) {
 
 // Remove a reading
 app.post('/user/:id/read/:bookid/remove', function (req, res) {
+    console.log("remove called");
     if (authzUser(req,req.params.id)) {
-        readings.remove(req.params.id,req.params.bookid,function(err,res) {
+        readings.remove(req.params.id,req.params.bookid,function(err,rm) {
             if (err) {
                 console.log("Error removing reading",err);
+            } else {
+                console.log("Remove happened without error");
             }
+            
             res.redirect('/user/'+req.params.id);
         });
     } else {

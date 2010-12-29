@@ -100,6 +100,7 @@ exports.create = function(attrs, callback) {
     });
 };
 
+// returns null if book not found
 exports.get_by_book_id = function(userid, book_id, callback) {
     var client = rclient.getClient();
     var rkey = key_from_id(userid,book_id);
@@ -112,7 +113,7 @@ exports.get_by_book_id = function(userid, book_id, callback) {
             return;
         } else if (_.isNull(res) || _.isUndefined(res)) {
             console.log("No value for",rkey);
-            callback("Reading does not exist",null);
+            callback(null,null);
             return;
         }
         try {
@@ -181,14 +182,18 @@ exports.remove = function remove_reading(userid, bookid, callback) {
 
 // Remove a reading and associated entries in indices
 Reading.prototype.remove = function remove(callback) {
+    console.log("object remove called");
     var client = rclient.getClient();
     var context = this;
+    callback(null,null);
     client.del(context.key(),function(err,res) {
+        console.log("del returned");
         if (err) {
             console.log("Error deleting reading key",err);
         }
     });
     set_remove_reading(context.userid, context.book_id, function(err,res) {
+        console.log("remove reading returned");
         if (err) {
             console.log("Error deleting reading key",err);
         }

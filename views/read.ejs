@@ -12,18 +12,22 @@
 <% if(userIsHome) { %>
 <script type="text/javascript" language="javascript">
 $(document).ready(function() {
-  $('#delete-reading').jConfirmAction();
+    var yf = function() {$('#delete-reading-form').submit()};
+    $('#delete-reading-button').jConfirmAction({yesFunction: yf});
 });
 </script>
 <div id="subnav" class="prepend-2 span-6 last">
 <ul>
 <li><a href="#" onclick="$('#edit-book').toggle('fast')">Edit</a></li>
-<li><a id="delete-reading" href="#">Delete</a></li>
+<li><a id="delete-reading-button" href="#">Delete</a></li>
 </ul>
 </div>
 <% } %>
 
 </div>
+
+<form id="delete-reading-form" class="hidden" action="/user/<%=user.id%>/read/<%=reading.book_id%>/remove" method="post">
+</form>
 
 <% if(userIsHome) { %>
 <div id="edit-book" class="hidden container">
