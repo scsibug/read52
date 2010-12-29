@@ -82,15 +82,13 @@ exports.create = function(attrs, callback) {
     exports.reading_exists(attrs.userid,attrs.book_id,function(err,res) {
         if (!err && !res) {
             var reading = new Reading(attrs);
-            set_add_reading(attrs.userid,+(attrs.completion_date),attrs.book_id,function (err,res) {
-                reading.save(function (err,res) {
-                    callback(err,res);
-                    // after save, publish action with user name and book title
-                    books.get_by_id(attrs.book_id,function(err,book) {
-                        if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
-                            actions.publish_action(attrs.userid,"read " + book.title)
-                        }
-                    });
+            reading.save(function (err,res) {
+                callback(err,res);
+                // after save, publish action with user name and book title
+                books.get_by_id(attrs.book_id,function(err,book) {
+                    if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
+                        actions.publish_action(attrs.userid,"read " + book.title)
+                    }
                 });
             });
         } else {
@@ -154,7 +152,15 @@ Reading.prototype.save = function save(callback) {
         if (err) {
             callback(err,null);
         } else {
-            callback(err,context);
+            // update reading set (in case completion date changed)
+            set_add_reading(context.userid,+(context.completion_date),context.book_id,function (err,res) {
+                if (err) {
+                    console.log("Error adding reading to set",err);
+                    callback(err,null)
+                } else {
+                    callback(err,context);
+                }
+            });
         }
     });
 };
