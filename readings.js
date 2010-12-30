@@ -6,6 +6,7 @@ var sys = require('sys');
 var rclient = require('./redisclient');
 var actions = require('./actions');
 var books = require('./books');
+var badge_log = require('./badger/badge_process_log');
 
 // Keys that are specific to a reading object, that should be serialized/deserialized
 var reading_keys = ["userid", "book_id", "comment", "rating", "completion_date", "creation_date"];
@@ -87,6 +88,8 @@ exports.create = function(attrs, callback) {
             var reading = new Reading(attrs);
             reading.save(function (err,res) {
                 callback(err,res);
+                // make log entry for badge processing
+                badge_log.add_reading(attrs.userid,attrs.book_id);
                 // after save, publish action with user name and book title
                 books.get_by_id(attrs.book_id,function(err,book) {
                     if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
@@ -190,6 +193,8 @@ Reading.prototype.remove = function remove(callback) {
         console.log("del returned");
         if (err) {
             console.log("Error deleting reading key",err);
+        } else {
+            badge_log.remove_reading(context.userid,context.book_id);
         }
     });
     set_remove_reading(context.userid, context.book_id, function(err,res) {
