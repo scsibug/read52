@@ -37,4 +37,3 @@ exports.getSessionClient = function() {
     }
     return sessionclient;
 };
-
