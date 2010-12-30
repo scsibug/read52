@@ -32,7 +32,8 @@ var add_reading_log_entry = function (action,userid,bookid) {
     });
 };
 
-var pop_reading_log_entry = function (callback) {
+//TODO: safe queue with rpoplpush
+exports.pop_reading_log_entry = function (callback) {
     var client = rclient.getClient();
     client.rpop(badge_log_key,function(err,elem) {
         if (err) {
