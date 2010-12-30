@@ -139,11 +139,10 @@ app.get('/user/:id/annual_book_count', function(req,res) {
     });
 });
 
-app.get('/user/:id', function(req, res) {
+app.get('/user/:id', function(req, res, next) {
     users.user_id_exists(req.params.id,function(err,exists) {
         if (err || !exists) {
-            res.send("User "+req.params.id+" does not exist", 404);
-            return;
+            return next(new NotFound('User "+req.params.id+" does not exist.'));
         }
         users.get_by_id(req.params.id, function(err, pageuser) {
             if (err) {
@@ -218,7 +217,7 @@ app.post('/user/:id/import', function (req, res) {
     }
 });
 
-app.get('/user/:id/read/:bookid', function (req, res) {
+app.get('/user/:id/read/:bookid', function (req, res, next) {
     users.get_by_id(req.params.id, function(err, pageuser) {
         if (err) {
             console.log(err);
@@ -229,8 +228,7 @@ app.get('/user/:id/read/:bookid', function (req, res) {
                 console.log("Error:",err);
                 res.redirect('/');
             } else if (_.isNull(r)) {
-                console.log("Request for a reading that does not exist");
-                res.send("This user has not read that book.", 404);                
+                return next(new NotFound('Reading does not exist.'));
             } else {
                 res.render('read', {
                     locals: { reading: r,
@@ -362,7 +360,7 @@ app.get('/book/:id', function(req, res) {
 });
 
 // Raw book information (mostly for debugging at the moment)
-app.get('/book/:id/:key', function(req, res) {
+app.get('/book/:id/:key', function(req, res, next) {
     (new books.Book(req.params.id, function(err,b) {
         var content = b[req.params.key];
         if (!_.isUndefined(content) && !_.isNull(content)) {
@@ -375,7 +373,7 @@ app.get('/book/:id/:key', function(req, res) {
             }
             res.send(b[req.params.key].toString());
         } else {
-            res.send("Key "+req.params.key+" does not exist", 404);
+            return next(new NotFound('Key "+req.params.key+" does not exist.'));
         }
     }));
 });
@@ -392,9 +390,56 @@ app.post('/book/:id/update', function(req, res) {
 
 // Static files.  Keep this last so it doesn't interfere with dynamic routes.
 app.use(express.staticProvider(__dirname + '/static'));
+
+/*************** Error Handling *************/
+function NotFound(msg) {
+    this.name = 'NotFound';
+    this.msg = msg;
+    Error.call(this, msg);
+    Error.captureStackTrace(this, arguments.callee);
+}
+
+sys.inherits(NotFound, Error);
+
+// Error page
+app.get('/error', function(req, res) {
+    unknownMethod();
+});
+
+app.error(function(err, req, res, next) {
+    if (err instanceof NotFound) {
+        res.render('404', { status: 404,
+                            locals: {
+                                title: "Not Found",
+                                user: null,
+                                nav: "",
+                                msg: err.msg
+                            }
+                          });
+    } else {
+        next(err);
+    }
+});
+
+app.error(function(err, req, res) {
+    console.log(sys.inspect(err));
+    console.log(err.message);
+    res.render('500', {
+        status: 500,
+        locals: {
+            title: "Error",
+            nav: "",
+            user: req.getAuthDetails().user,
+            error: err
+        } 
+    });
+});
+
+
 // Start the server
 app.listen(8124);
 
+/************** Socket.IO *****************/
 // Broadcast recent events
 var socket = io.listen(app);
 
