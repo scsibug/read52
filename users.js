@@ -148,6 +148,10 @@ exports.get_users = function(callback) {
     var users = [];
     // hack, should make a set if we really want this functionality.
     client.keys(key_from_id("*"), function(err, reply) {
+        if (err || _.isNull(reply)) {
+            callback(err,users);
+            return;
+        }
         for(var i=0; i < reply.length; i++) {
             var user_key = reply[i].toString();
             get_by_key(user_key,function(err,thisuser) {
