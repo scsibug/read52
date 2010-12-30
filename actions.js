@@ -12,8 +12,7 @@ exports.publish_action = function(user_id, action, callback) {
     users.get_by_id(user_id, function(err,user) {
         if(!_.isNull(user.name)) {
             action = user.name + " " + action;
-             if (!_.isUndefined(listener)) {
-                if (_.isFunction(listener)) {console.log("Listener is a function");}
+            if (!_.isUndefined(listener)) {
                 listener([action]);
             }
             client.lpush(global_action_list,action,function(err,res) {

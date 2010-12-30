@@ -1,9 +1,9 @@
 var sys = require('sys'),
-OperationHelper = require('apac').OperationHelper;
+    OperationHelper = require('apac').OperationHelper;
 var _ = require('underscore');
 var isbnlib = require('./isbn');
 var aws_credentials = require('./aws_cred');
-
+var tq = require('./throttled_queue');
 opHelper = new OperationHelper({
     awsId:     aws_credentials.awsId,
     awsSecret: aws_credentials.awsSecret,
@@ -53,11 +53,9 @@ var process_amz_result = function(results) {
     } else if (results.Items.Item.constructor == Array) {
         console.log("This query returned multiple books, we'll just blindly take the first for now.");
         result = results.Items.Item.shift();
-        callback(error, results.Items.Item.shift());
     } else {
         console.log("single result");
         result = results.Items.Item
-        console.log(sys.inspect(result));
     }
     var ctx = {};
     ctx.title = result.ItemAttributes.Title;
@@ -89,4 +87,9 @@ var process_amz_result = function(results) {
 }
 
 // Amazon prefers 1 second between calls, or 503 errors become likely.
-exports.lookup = _.throttle(lookup_unthrottled, 1100);
+// underscore's throttle does NOT do what we thought it did!
+//exports.lookup = _.throttle(lookup_unthrottled, 1100);
+var queue = new tq.ThrottledQueue({delay: 1100});
+exports.lookup = tq.throttle(queue,lookup_unthrottled);
+
+

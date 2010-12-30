@@ -102,8 +102,10 @@ exports.create_from_identifier = function(term,callback) {
                 console.log(err);
                 callback("Error finding book ID",null);
             } else if (_.isNull(result)) {
+                console.log("consulting book lookup service for metadata.");
                 // if book not found, send URI to book lookup service
                 book_lookup.lookup(search.type, search.value, function(err,lookup_book) {
+                    console.log("book lookup service returned");
                     var b = new Book(lookup_book);
                     make_book_id(function(err,book_id) {
                         if (err) {
@@ -111,8 +113,8 @@ exports.create_from_identifier = function(term,callback) {
                             callback("Could not create unique identifier for book",null);
                         }
                         b.id = book_id
-                        b.save(function() {
-                            callback(null,b);
+                        b.save(function(err) {
+                            callback(err,b);
                         });
                     });
                 });

@@ -13,12 +13,15 @@ var RedisStore = require('./connect_redis');
 var app = express.createServer();
 var isbn = require('./isbn');
 var io = require('socket.io');
+var form = require('connect-form');
+var fs = require('fs');
 
 app.configure(function() {
     app.use(express.bodyDecoder());
     app.use(express.cookieDecoder());
     app.use(express.session({ store: new RedisStore({ maxAge: 60000 * 60 * 24 * 30 })}));
     app.use(auth(form_strategy()));
+    app.use(form({ keepExtensions: true }));
 });
 
 // EJS is our default templating system
@@ -142,7 +145,7 @@ app.get('/user/:id/annual_book_count', function(req,res) {
 app.get('/user/:id', function(req, res, next) {
     users.user_id_exists(req.params.id,function(err,exists) {
         if (err || !exists) {
-            return next(new NotFound('User "+req.params.id+" does not exist.'));
+            return next(new NotFound("User "+req.params.id+" does not exist."));
         }
         users.get_by_id(req.params.id, function(err, pageuser) {
             if (err) {
@@ -193,24 +196,71 @@ app.get('/user/:id/export', function (req, res) {
     });
 });
 
+app.get('/user/:id/import', function (req, res) {
+    res.render('import', {
+        locals: { title: "Import Data",
+                  nav: "",
+                  userIsHome: authzUser(req,req.params.id),
+                  user: req.getAuthDetails().user
+                }
+    });
+});
+
 // Bulk import user data
 // TODO: make this work with ISBN/EAN/ASIN instead of non-portable book IDs
+// format for POSTed import data.
+// Must be JSON.
+// A single array of entries.
+// Each entry is an object with the following fields (if they exist):
+// ean, asin, comment, rating, completion_date
 app.post('/user/:id/import', function (req, res) {
+    sys.print(sys.inspect(req));
     if (authzUser(req,req.params.id)) {
-        var importjson = JSON.parse(req.rawBody);
-        // We are expecting the body to be JSON-encoded readings.
-        // We ignore some fields(userid), and use the rest to recreate readings.
-        res.send("thanks...will try to import this!");
-        _.each(importjson,function(elem, index, list) {
-            var r = {};
-            r.userid = req.params.id;
-            r.book_id = elem.book_id;
-            r.completion_date = elem.completion_date;
-            r.rating = elem.rating;
-            r.comment = elem.comment;
-            readings.create(r,function() {console.log("created reading for",r.book_id)});
-            console.log("working on",elem);
-        });
+        if (req.form) {
+            req.form.complete(function(err, fields, files) {
+                console.log("ERR",err);
+                console.log("Fields",sys.inspect(fields));
+                console.log("Files",sys.inspect(files));
+                // our file is at:
+                var location = files.datafile.path
+                fs.readFile(location, function (err,data) {
+                    fs.unlink(location,function(err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
+                    var importjson = JSON.parse(data);
+                    // We are expecting the body to be JSON-encoded readings.
+                    // We ignore some fields(userid), and use the rest to recreate readings.
+                    
+                    _.each(importjson,function(elem, index, list) {
+                        var total = list.length;
+                        var identifier = elem.asin;
+                        // prefer EAN if it exists
+                        if (elem.ean) {
+                            identifier = elem.ean
+                        }
+                        var addElem = function(identifier,elem) {
+                            books.create_from_identifier(identifier,function(err,book) {
+                            var book_id = book.id;
+                                readings.create(
+                                    {userid: req.params.id,
+                                     book_id: book_id,
+                                     comment: elem.comment,
+                                     rating: elem.rating,
+                                     completion_date: elem.completion_date
+                                    },function(err,reading) {
+                                    });
+                            });
+                        }
+                        addElem(identifier,elem);
+                        res.send("thanks...will try to import this!");
+                    });
+                });
+            });
+        } else {
+            res.redirect('/'); // No form data!
+        }
     } else {
         console.log("Unauthorized POST against user",req.params.id);
         res.send("Not authorized",401);
@@ -228,7 +278,7 @@ app.get('/user/:id/read/:bookid', function (req, res, next) {
                 console.log("Error:",err);
                 res.redirect('/');
             } else if (_.isNull(r)) {
-                return next(new NotFound('Reading does not exist.'));
+                return next(new NotFound("Reading does not exist."));
             } else {
                 res.render('read', {
                     locals: { reading: r,
@@ -373,7 +423,7 @@ app.get('/book/:id/:key', function(req, res, next) {
             }
             res.send(b[req.params.key].toString());
         } else {
-            return next(new NotFound('Key "+req.params.key+" does not exist.'));
+            return next(new NotFound("Key "+req.params.key+" does not exist."));
         }
     }));
 });
