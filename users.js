@@ -78,7 +78,11 @@ var get_by_key = function(key, callback) {
     var client = rclient.getClient();
     // Lookup user by ID directly
     client.get(key, function(err,result) {
-        var json = JSON.parse(result);
+        if (err) {
+            console.log("Error getting user by key:", err);
+        }
+        console.log("result is",result);
+        var json = JSON.parse(result); // seems to die on occasion...maybe due to redis reconnect?
         var user = new User(json);
         callback(err,user);
     });
