@@ -75,7 +75,7 @@ $(document).ready(function() {
 <dt>ASIN/ISBN</dt><dd><%= reading.book.asin %></dd>
 
 <% if (reading.completion_date) { %>
-<dt>Completed On</dt><dd><%= new Date(reading.completion_date) %>
+<dt>Completed On</dt><dd><%= new Date(reading.completion_date).toDateString() %>
 <% } %>
 
 <% if (reading.rating) { %>
