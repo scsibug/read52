@@ -5,6 +5,7 @@ var _ = require('underscore');
 var active_badge_names =
     [
         '1000page',
+        'millenium_trilogy'
     ];
 
 var active_badges = [];
