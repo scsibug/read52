@@ -107,9 +107,7 @@ exports.create = function(attrs, callback) {
 exports.get_by_book_id = function(userid, book_id, callback) {
     var client = rclient.getClient();
     var rkey = key_from_id(userid,book_id);
-    console.log("get",rkey);
     client.get(rkey,function(err,res) {
-        console.log("returns ",res);
         if (err) {
             console.log("Error: ",err);
             callback(err,null);
@@ -185,7 +183,6 @@ exports.remove = function remove_reading(userid, bookid, callback) {
 
 // Remove a reading and associated entries in indices
 Reading.prototype.remove = function remove(callback) {
-    console.log("object remove called");
     var client = rclient.getClient();
     var context = this;
     callback(null,null);
