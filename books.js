@@ -281,15 +281,15 @@ Book.prototype.author_like = function(author_pattern) {
         return false;
     }
     // force into array
-    if (!_.isArray(this.authors)) {
+    if (!_.isArray(authors)) {
         authors = [authors];
     } 
     // run match on each author
-    if (_.isArray(this.authors)) {
-        for(var i = 0; i < this.authors.length; i++) {
-            var a = this.authors[i];
+    if (_.isArray(authors)) {
+        for(var i = 0; i < authors.length; i++) {
+            var a = authors[i];
             if (_.isString(a)) {
-                var m = this.authors[i].match(author_substring);
+                var m = authors[i].match(author_pattern);
                 if (!_.isNull(m)) {
                     return true;
                 }
