@@ -10,8 +10,9 @@ var books = require('../books');
 var readings = require('../readings');
 var badges = require('./badges/active');
 
-// have every active badge process a reading, callback when all have completed.
-var process_reading = function(action, reading, callback) {
+// have every active badge process a reading (if adding) or book (if removing),
+// callback is triggered when all have completed.
+var process_event = function(action, userid, object, callback) {
     var procs = badges.badges;
     var completed = 0;
     for (var i = 0; i < procs.length; i++) {
@@ -22,11 +23,11 @@ var process_reading = function(action, reading, callback) {
             }
         }
         // get user badge
-        procs[i].get_user_badge(reading.userid,function(err,badge) {
+        procs[i].get_user_badge(userid,function(err,badge) {
             if (action === '+') {
-                badge.add_reading(reading,finished);
+                badge.add_reading(object,finished);
             } else if (action === '-') {
-                badge.remove_reading(reading,finished);
+                badge.remove_book(object,finished);
             }
         });
     }
@@ -41,19 +42,34 @@ var process_logs = function(callback) {
             callback();
         } else {
             console.log("Got entry:",sys.inspect(entry));
-            // get the reading for the entry
-            readings.get_by_book_id(entry.userid,entry.bookid,function(err,r) {
-                if (err) {
-                    console.log("Error getting reading:",err);
-                    console.log("This event has been dropped!");
-                    process_logs(callback);
-                } else {
-                    console.log("Examining ",r.book.title,"for user",r.userid);
-                    // send the reading to each badge,
-                    // when they finish, execute this function again.
-                    process_reading(entry.action,r,function() {process_logs(callback);});
-                }
-            });
+            // get the reading or book for the entry
+            if (entry.action === '+') {
+                readings.get_by_book_id(entry.userid,entry.bookid,function(err,r) {
+                    if (err) {
+                        console.log("Error getting reading:",err);
+                        console.log("This event has been dropped!");
+                        process_logs(callback);
+                    } else {
+                        console.log("Examining ",r.book.title,"for user",r.userid);
+                        // send the reading to each badge,
+                        // when they finish, execute this function again.
+                        process_event(entry.action, entry.userid, r,function() {process_logs(callback);});
+                    }
+                });
+            } else if (entry.action === '-') {
+                books.get_by_id(entry.bookid,function(err,b) {
+                    if (err) {
+                        console.log("Error getting reading:",err);
+                        console.log("This event has been dropped!");
+                        process_logs(callback);
+                    } else {
+                        console.log("Examining ",b.title,"for user",entry.userid);
+                        // send the reading to each badge,
+                        // when they finish, execute this function again.
+                        process_event(entry.action, entry.userid, b,function() {process_logs(callback);});
+                    }
+                });
+            }
         }
     });
 };

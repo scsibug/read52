@@ -25,28 +25,35 @@ function Badge (userid,attrs) {
 Badge.prototype.add_reading = function(reading,callback) {
     console.log("badge is adding reading ",reading.book.title);
     var context = this;
-    if (_.isNumber(reading.book.pages)) {
-        context.state.reading.book_id = reading.book.pages
+    var bid = reading.book_id;
+    var pages = parseInt(reading.book.pages);
+    if (_.isNumber(pages)) {
+        context.state[bid] = pages
+    } else {
+        console.log("pages was not a number");
     }
+    console.log("about to save state");
     context.save(function(err,result) {
         context.check_award(callback);
     });
 };
 
-Badge.prototype.remove_reading = function(reading,callback) {
-    console.log("badge is removing reading ",reading.book.title);
+Badge.prototype.remove_book = function(book,callback) {
+    console.log("badge is removing reading for ",book.title);
     var context = this;
-    if (_.isNumber(reading.book.pages)) {
-        delete(context.state.reading.book_id);
-    }
+    delete(context.state[book.id]);
     context.save(function(err,result) {
+        console.log("state save completed");
         context.check_award(callback);
     });
 };
 
 Badge.prototype.save = function(callback) {
+    console.log("saving badge state");
     var client = rclient.getClient();
     var key = user_key(this.userid);
+    console.log("saving at key:",key);
+    console.log("state to save:",JSON.stringify(this.state));
     client.set(key,JSON.stringify(this.state),callback);
 }
 
@@ -55,8 +62,10 @@ Badge.prototype.check_award = function(callback) {
     // sum all page counts in state
     var pagecount = 0;
     for (bookid in this.state) {
-        pagecount =+ this.state[bookid]
+        console.log("adding pagecount: ",this.state[bookid]);
+        pagecount += this.state[bookid]
     }
+    console.log("pagecount total was",pagecount);
     if (pagecount >= 1000) {
         console.log("Award badge!");
         this.award(callback);
@@ -70,6 +79,7 @@ Badge.prototype.check_award = function(callback) {
 // Note that this badge was awarded to the user
 Badge.prototype.award = function(callback) {
     var client = rclient.getClient();
+    var context = this;
     var award_date = +new Date();
     var key = users.user_badges_zset(this.userid);
     // check if badge has already been awarded
@@ -80,7 +90,7 @@ Badge.prototype.award = function(callback) {
         } else {
             if (_.isNull(rank)) {
                 // badge has not been awarded
-                client.zadd(key,this.id,function(err,res) {
+                client.zadd(key,award_date,context.id,function(err,res) {
                     if (err) {
                         console.log("Error:",err);
                     } else {
@@ -89,6 +99,7 @@ Badge.prototype.award = function(callback) {
                     callback();
                 });
             } else {
+                console.log("badge had already been awarded, not actually doing anything...");
                 // badge was already awarded, nothing to be done
                 callback();
             }
