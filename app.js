@@ -232,7 +232,7 @@ app.post('/user/:id/import', function (req, res) {
                     var importjson = JSON.parse(data);
                     // We are expecting the body to be JSON-encoded readings.
                     // We ignore some fields(userid), and use the rest to recreate readings.
-                    
+
                     _.each(importjson,function(elem, index, list) {
                         var total = list.length;
                         var identifier = elem.asin;
@@ -294,7 +294,6 @@ app.get('/user/:id/read/:bookid', function (req, res, next) {
     });
 });
 
-
 // Add a book that a user has read
 app.post('/user/:id/read', function (req, res) {
     var completion_date = parseInt(req.body["completion-date"]);
@@ -323,7 +322,7 @@ app.post('/user/:id/read', function (req, res) {
                 function(err,reading) {
                     res.redirect('/user/'+req.params.id+'/read/'+book_id);
                 });
-        });        
+        });
     } else {
         console.log("Unauthorized POST against user",req.params.id);
         res.send("Not authorized",401);
@@ -340,7 +339,7 @@ app.post('/user/:id/read/:bookid/remove', function (req, res) {
             } else {
                 console.log("Remove happened without error");
             }
-            
+
             res.redirect('/user/'+req.params.id);
         });
     } else {
@@ -482,10 +481,9 @@ app.error(function(err, req, res) {
             nav: "",
             user: req.getAuthDetails().user,
             error: err
-        } 
+        }
     });
 });
-
 
 // Start the server
 app.listen(8124);

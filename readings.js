@@ -59,7 +59,7 @@ exports.clean_rating = function (dirty_rating) {
         if (clean_rating > 100) {clean_rating = 100;}
     }
     return clean_rating;
-}
+};
 
 // Create a reading object from a set of attributes.
 function Reading (attrs) {
@@ -146,7 +146,7 @@ Reading.prototype.get_rating = function get_rating() {
     } else {
         return (incr * parseInt(this.rating / incr));
     }
-}
+};
 
 Reading.prototype.save = function save(callback) {
     var client = rclient.getClient();
@@ -180,7 +180,7 @@ Reading.prototype.key = function key() {
 exports.remove = function remove_reading(userid, bookid, callback) {
     var reading = new Reading({userid: userid, book_id: bookid});
     reading.remove(callback);
-}
+};
 
 // Remove a reading and associated entries in indices
 Reading.prototype.remove = function remove(callback) {

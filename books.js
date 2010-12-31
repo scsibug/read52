@@ -45,7 +45,7 @@ exports.isbn_to_uri = function(i) {
     } else {
         return "urn:isbn:"+isbn_num;
     }
-}
+};
 
 exports.asin_to_uri = function(asin) {
     if (_.isNull(asin)||!exports.isASINlike(asin)) {
@@ -53,7 +53,7 @@ exports.asin_to_uri = function(asin) {
     } else {
         return "http://amzn.com/"+asin;
     }
-}
+};
 
 // Detect what our search term contains.
 // Returns either "EAN", "ASIN", or "unknown"
@@ -177,7 +177,7 @@ Book.prototype.load_from_json = function(json) {
 var make_book_id = function(callback) {
     var client = rclient.getClient();
     client.incr(bookincr,callback);
-}
+};
 
 // Save a book to redis
 // this writes JSON to the :info key,
@@ -201,7 +201,7 @@ Book.prototype.save = function save(callback) {
                 if (err) {
                     console.log(err);
                 }
-                callback(err,context);             
+                callback(err,context);
             });
             // update hash entries for ean/asin
             context.update_indexes(null);
@@ -224,7 +224,7 @@ Book.prototype.update_indexes = function(callback) {
     if (!_.isNull(this.asin) && (!_.isUndefined(this.asin))) {
         client.hset(book_uri_hash,exports.asin_to_uri(this.asin),this.id,notify);
     }
-}
+};
 
 Book.prototype.toJSON = function() {
     var json = {};
