@@ -39,18 +39,13 @@ Badge.prototype.remove_book_transform = function(book,callback) {
 };
 
 // determine if the badge should be awarded, and if yes, do so
-Badge.prototype.check_award = function(callback) {
+Badge.prototype.should_award = function(callback) {
     // sum all page counts in state
     var pagecount = 0;
     for (bookid in this.state) {
         pagecount += this.state[bookid]
     }
-    if (pagecount >= 1000) {
-        this.award(callback);
-    } else {
-        // Criteria not yet met... TODO: Take badge away?
-        callback();
-    }
+    return (pagecount >= 1000);
 }
 
 exports.Badge = Badge;

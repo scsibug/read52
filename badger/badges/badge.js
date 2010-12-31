@@ -83,7 +83,17 @@ Badge.prototype.save = function(callback) {
 
 // determine if the badge should be awarded, and if yes, do so
 Badge.prototype.check_award = function(callback) {
-    callback();
+    if (this.should_award()) {
+        this.award(callback);
+    } else {
+        callback();
+    }
+}
+
+// boolean function that determines if user should get badge.
+// keeps pesky callbacks out of actual badge subclasses.
+Badge.prototype.should_award() {
+    return false;
 }
 
 // Note that this badge was awarded to the user

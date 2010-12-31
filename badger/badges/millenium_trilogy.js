@@ -120,8 +120,8 @@ Badge.prototype.remove_book_transform = function(book,callback) {
     callback();
 };
 
-// determine if the badge should be awarded, and if yes, do so
-Badge.prototype.check_award = function(callback) {
+// Award if there are values in all three slots of the trilogy.
+Badge.prototype.should_award = function() {
     var s = this.state;
     var nonempty = function(arr) {
         if (_.isNull(arr) || _.isUndefined(arr) || !_.isArray(arr)) {
@@ -130,10 +130,10 @@ Badge.prototype.check_award = function(callback) {
         return (arr.length > 0);
     }
     if (nonempty(s['1']) && nonempty(s['2']) && nonempty(s['3'])) {
-        this.award(callback);
+        return true;
     } else {
-        callback();
-    }
+        return false;
+    }    
 }
 
 exports.Badge = Badge;
