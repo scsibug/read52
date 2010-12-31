@@ -32,8 +32,14 @@ Badge.prototype.add_reading_transform = function(reading,callback) {
 
 Badge.prototype.add_reading = function(reading,callback) {
     console.log("badge is adding reading ",reading.book.title);
+    var context = this;
+    console.log("before transform:",sys.inspect(context.state));
     this.add_reading_transform(reading,function() {
+        console.log("after transform:",sys.inspect(context.state));
         context.save(function(err,result) {
+            if (err) {
+                console.log("error saving: ",err);
+            }
             context.check_award(callback);
         });
     });
@@ -46,8 +52,13 @@ Badge.prototype.remove_book_transform = function(book,callback) {
 Badge.prototype.remove_book = function(book,callback) {
     console.log("badge is removing reading for ",book.title);
     var context = this;
+    console.log("before transform:",sys.inspect(context.state));
     context.remove_book_transform(book,function() {
+        console.log("after transform:",sys.inspect(context.state));
         context.save(function(err,result) {
+            if (err) {
+                console.log("error saving: ",err);
+            }
             context.check_award(callback);
         });
     });
@@ -58,27 +69,21 @@ Badge.prototype.save = function(callback) {
     var client = rclient.getClient();
     var key = this.user_key();
     console.log("saving at key:",key);
-    console.log("state to save:",JSON.stringify(this.state));
-    client.set(key,JSON.stringify(this.state),callback);
+    var state_string = JSON.stringify(this.state);
+    if (state_string === "{}") {
+        console.log("Not saving anything");
+        // don't bother saving the default state
+        callback(null,null);
+    } else {
+        var state_to_save = JSON.stringify(this.state);
+        console.log("saving state: ",state_to_save);
+        client.set(key,state_to_save,callback);
+    }
 }
 
 // determine if the badge should be awarded, and if yes, do so
 Badge.prototype.check_award = function(callback) {
-    // sum all page counts in state
-    var pagecount = 0;
-    for (bookid in this.state) {
-        console.log("adding pagecount: ",this.state[bookid]);
-        pagecount += this.state[bookid]
-    }
-    console.log("pagecount total was",pagecount);
-    if (pagecount >= 1000) {
-        console.log("Award badge!");
-        this.award(callback);
-    } else {
-        // Take badge away?
-        console.log("User has not met criteria for badge",this.id);
-        callback();
-    }
+    callback();
 }
 
 // Note that this badge was awarded to the user
@@ -116,16 +121,21 @@ Badge.prototype.award = function(callback) {
 Badge.prototype.load = function(callback) {
     var client = rclient.getClient();
     var context = this;
+    console.log("loading state for ",context.user_key());
     // attempt to get the key
     client.get(context.user_key(),function(err,result) {
         if (err) {
-            console.log(err);
+            console.log("Error:",err);
             callback(err,null);
+            return;
         }
-        if (_.isNull(result)) {
+        console.log("retrieved key is: ",result);
+        if (_.isNull(result) || _.isUndefined(result)) {
+            console.log("key was null/undefined");
             result = '{}'
         }
         context.state = JSON.parse(result);
+        console.log("parsed result is",sys.inspect(context.state));
         callback(err,context);
     });
 }
