@@ -19,6 +19,7 @@ exports.badge_info =
 function Badge (userid) {
     badge_template.Badge.apply(this,arguments);
     this.id = name;
+    this.page_goal = 1000;
 };
 // inherit from the badge template
 sys.inherits(Badge, badge_template.Badge);
@@ -45,7 +46,7 @@ Badge.prototype.should_award = function(callback) {
     for (bookid in this.state) {
         pagecount += this.state[bookid]
     }
-    return (pagecount >= 1000);
+    return (pagecount >= this.page_goal);
 }
 
 exports.Badge = Badge;
