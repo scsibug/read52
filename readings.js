@@ -87,14 +87,14 @@ exports.create = function(attrs, callback) {
         if (!err && !res) {
             var reading = new Reading(attrs);
             reading.save(function (err,res) {
-                callback(err,res);
-                // make log entry for badge processing
-                badge_log.add_reading(attrs.userid,attrs.book_id);
-                // after save, publish action with user name and book title
+                // publish action with user name and book title,
+                // and copy book data into reading
                 books.get_by_id(attrs.book_id,function(err,book) {
                     if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
                         actions.publish_action(attrs.userid,"read " + book.title)
                     }
+                    reading.book = book;
+                    callback(err,reading);
                 });
             });
         } else {
@@ -154,6 +154,7 @@ Reading.prototype.save = function save(callback) {
     context.modified_date = +new Date();
     var obj_string = JSON.stringify(context);
     client.set(context.key(), obj_string, function(err,r) {
+            badge_log.add_reading(context.userid,context.book_id);
         if (err) {
             callback(err,null);
         } else {
