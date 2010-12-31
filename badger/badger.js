@@ -15,24 +15,27 @@ var badges = require('./badges/active');
 var process_event = function(action, userid, object, callback) {
     var procs = badges.badges;
     var completed = 0;
-    for (var i = 0; i < procs.length; i++) {
-        var finished = function() {
-            completed++;
-            if (completed === procs.length) {
-                callback();
-            }
+    console.log("There are "+procs.length+" badges to process");
+    var finished = function() {
+        completed++;
+        if (completed === procs.length) {
+            callback();
         }
-        // get user badge
-        var badge = new procs[i].Badge(userid);
-        badge.load(function() {
-            if (action === '+') {
-                badge.add_reading(object,finished);
-            } else if (action === '-') {
-                badge.remove_book(object,finished);
-            }
-        });
     }
-}
+    for (var i = 0; i < procs.length; i++) {
+        var badge = new procs[i].Badge(userid);
+        var do_badge_processing = function(badge) {
+            badge.load(function() {
+                if (action === '+') {
+                    badge.add_reading(object,finished);
+                } else if (action === '-') {
+                    badge.remove_book(object,finished);
+                }
+            });
+        }
+        do_badge_processing(badge);
+    }
+};
 
 var process_logs = function(callback) {
     bpl.pop_reading_log_entry(function(err,entry) {
@@ -77,7 +80,8 @@ var process_logs = function(callback) {
 
 console.log("Badger starting...");
 process_logs(function() {
+    console.log("Badger completed...Closing client");
     client.quit();
 });
-console.log("Badger completed...");
+
 
