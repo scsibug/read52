@@ -2,7 +2,6 @@
 // Awarded when total read page count exceeds 1000.
 
 var sys = require('sys');
-var rclient = require('../../redisclient');
 var _ = require('underscore');
 var users = require('../../users');
 var badge_template = require('./badge');
@@ -12,7 +11,7 @@ var name = "1000page";
 exports.badge_info =
     {
         id: name,
-        name: "1000 Pages",
+        name: "1,000 Pages",
         achievement: "Reading over 1,000 pages."
     }
 
@@ -28,7 +27,7 @@ sys.inherits(Badge, badge_template.Badge);
 Badge.prototype.add_reading_transform = function(reading,callback) {
     var pages = parseInt(reading.book.pages);
     if (_.isNumber(pages)) {
-        context.state[reading.book_id] = pages
+        this.state[reading.book_id] = pages
     }
     callback();
 };
@@ -44,16 +43,12 @@ Badge.prototype.check_award = function(callback) {
     // sum all page counts in state
     var pagecount = 0;
     for (bookid in this.state) {
-        console.log("adding pagecount: ",this.state[bookid]);
         pagecount += this.state[bookid]
     }
-    console.log("pagecount total was",pagecount);
     if (pagecount >= 1000) {
-        console.log("Award badge!");
         this.award(callback);
     } else {
-        // Take badge away?
-        console.log("User has not met criteria for badge",this.id);
+        // Criteria not yet met... TODO: Take badge away?
         callback();
     }
 }
