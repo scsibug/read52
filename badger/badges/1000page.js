@@ -21,30 +21,23 @@ function Badge (userid) {
     badge_template.Badge.apply(this,arguments);
     this.id = name;
 };
-
+// inherit from the badge template
 sys.inherits(Badge, badge_template.Badge);
 
-Badge.prototype.add_reading = function(reading,callback) {
-    console.log("badge is adding reading ",reading.book.title);
-    var context = this;
-    var bid = reading.book_id;
+// Steps to perform when a book is added or modified in the read list
+Badge.prototype.add_reading_transform = function(reading,callback) {
     var pages = parseInt(reading.book.pages);
     if (_.isNumber(pages)) {
-        context.state[bid] = pages
-    } else {
-        console.log("pages was not a number");
+        context.state[reading.book_id] = pages
     }
-    console.log("about to save state");
-    context.save(function(err,result) {
-        context.check_award(callback);
-    });
+    callback();
 };
 
 // Steps to perform when a book is removed from the read list.
 Badge.prototype.remove_book_transform = function(book,callback) {
     delete(this.state[book.id]);
     callback();
-}
+};
 
 // determine if the badge should be awarded, and if yes, do so
 Badge.prototype.check_award = function(callback) {

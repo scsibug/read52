@@ -26,19 +26,16 @@ Badge.prototype.user_key = function() {
     return "user:"+this.userid+":badgestate:"+this.id;
 }
 
+Badge.prototype.add_reading_transform = function(reading,callback) {
+    callback();
+}
+
 Badge.prototype.add_reading = function(reading,callback) {
     console.log("badge is adding reading ",reading.book.title);
-    var context = this;
-    var bid = reading.book_id;
-    var pages = parseInt(reading.book.pages);
-    if (_.isNumber(pages)) {
-        context.state[bid] = pages
-    } else {
-        console.log("pages was not a number");
-    }
-    console.log("about to save state");
-    context.save(function(err,result) {
-        context.check_award(callback);
+    this.add_reading_transform(reading,function() {
+        context.save(function(err,result) {
+            context.check_award(callback);
+        });
     });
 };
 
@@ -51,7 +48,6 @@ Badge.prototype.remove_book = function(book,callback) {
     var context = this;
     context.remove_book_transform(book,function() {
         context.save(function(err,result) {
-            console.log("state save completed");
             context.check_award(callback);
         });
     });
