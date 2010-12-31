@@ -9,6 +9,9 @@ var _ = require('underscore');
 var user_incr = "user_incr";
 var user_prefix = "user:";
 var user_mail_prefix = "user_email:";
+var user_badges_zset = function(userid) {
+    return (user_prefix+userid+":badgeset");
+}
 
 // Form the key used for looking up a userID from an email.
 // Performing a GET on the result returns the ID of the user.
