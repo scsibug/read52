@@ -26,7 +26,7 @@ $(document).ready(function() {
 
 </div>
 
-<form id="delete-reading-form" class="hidden" action="/user/<%=user.id%>/read/<%=reading.book_id%>/remove" method="post">
+<form id="delete-reading-form" class="hidden" action="/user/<%=pageuser.id%>/read/<%=reading.book_id%>/remove" method="post">
 </form>
 
 <% if(userIsHome) { %>
@@ -36,7 +36,7 @@ $(document).ready(function() {
           $('#edit-book :radio.star').rating('select', '<%= reading.rating %>');
         });
 </script>
-    <form id="add-book-form" action="/user/<%= user.id %>/read/<%= reading.book_id %>" method="post">
+    <form id="add-book-form" action="/user/<%= pageuser.id %>/read/<%= reading.book_id %>" method="post">
       <div class="span-12">
         <label>Rating</label><br />
                             <input class="star {split:2}" type="radio" name="rating" value="10"/>
