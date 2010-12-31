@@ -1,26 +1,28 @@
 // 1000-page badge
 // Awarded when total read page count exceeds 1000.
 
-// Template for other badges
-
+var sys = require('sys');
 var rclient = require('../../redisclient');
 var _ = require('underscore');
 var users = require('../../users');
+var badge_template = require('./badge');
 // badge key, must be unique.
 var name = "1000page";
 
-var user_key = function(userid) {
-    return "user:"+userid+":badgestate:"+name;
-}
+exports.badge_info =
+    {
+        id: name,
+        name: "1000 Pages",
+        achievement: "Reading over 1,000 pages."
+    }
 
 // the in-work state of a badge for a user
-function Badge (userid,attrs) {
-    var context = this;
-    context.userid = userid;
-    context.id = name;
-    context.state = attrs; // persisted state
-    return context;
+function Badge (userid) {
+    badge_template.Badge.apply(this,arguments);
+    this.id = name;
 };
+
+sys.inherits(Badge, badge_template.Badge);
 
 Badge.prototype.add_reading = function(reading,callback) {
     console.log("badge is adding reading ",reading.book.title);
@@ -38,23 +40,10 @@ Badge.prototype.add_reading = function(reading,callback) {
     });
 };
 
-Badge.prototype.remove_book = function(book,callback) {
-    console.log("badge is removing reading for ",book.title);
-    var context = this;
-    delete(context.state[book.id]);
-    context.save(function(err,result) {
-        console.log("state save completed");
-        context.check_award(callback);
-    });
-};
-
-Badge.prototype.save = function(callback) {
-    console.log("saving badge state");
-    var client = rclient.getClient();
-    var key = user_key(this.userid);
-    console.log("saving at key:",key);
-    console.log("state to save:",JSON.stringify(this.state));
-    client.set(key,JSON.stringify(this.state),callback);
+// Steps to perform when a book is removed from the read list.
+Badge.prototype.remove_book_transform = function(book,callback) {
+    delete(this.state[book.id]);
+    callback();
 }
 
 // determine if the badge should be awarded, and if yes, do so
@@ -74,55 +63,6 @@ Badge.prototype.check_award = function(callback) {
         console.log("User has not met criteria for badge",this.id);
         callback();
     }
-}
-
-// Note that this badge was awarded to the user
-Badge.prototype.award = function(callback) {
-    var client = rclient.getClient();
-    var context = this;
-    var award_date = +new Date();
-    var key = users.user_badges_zset(this.userid);
-    // check if badge has already been awarded
-    client.zrank(key,this.id,function(err,rank) {
-        if (err) {
-            console.log("Error:",err);
-            callback();
-        } else {
-            if (_.isNull(rank)) {
-                // badge has not been awarded
-                client.zadd(key,award_date,context.id,function(err,res) {
-                    if (err) {
-                        console.log("Error:",err);
-                    } else {
-                        console.log("Awarded badge");
-                    }
-                    callback();
-                });
-            } else {
-                console.log("badge had already been awarded, not actually doing anything...");
-                // badge was already awarded, nothing to be done
-                callback();
-            }
-        }
-    });
-};
-
-
-// sends callback error and stored state of the badge
-exports.get_user_badge = function(userid,callback) {
-        var client = rclient.getClient();
-    // attempt to get the key
-    client.get(user_key(userid),function(err,result) {
-        if (err) {
-            console.log(err);
-            callback(err,null);
-        }
-        if (_.isNull(result)) {
-            result = '{}'
-        }
-        var b = new Badge(userid,JSON.parse(result));
-        callback(err,b);
-    });
 }
 
 exports.Badge = Badge;

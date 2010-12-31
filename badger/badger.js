@@ -23,7 +23,8 @@ var process_event = function(action, userid, object, callback) {
             }
         }
         // get user badge
-        procs[i].get_user_badge(userid,function(err,badge) {
+        var badge = new procs[i].Badge(userid);
+        badge.load(function() {
             if (action === '+') {
                 badge.add_reading(object,finished);
             } else if (action === '-') {
