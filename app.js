@@ -473,7 +473,8 @@ app.error(function(err, req, res, next) {
 
 app.error(function(err, req, res) {
     console.log(sys.inspect(err));
-    console.log(err.message);
+    console.log("Stack:",sys.inspect(err.stack));
+    console.log("Message:",err.message);
     res.render('500', {
         status: 500,
         locals: {
