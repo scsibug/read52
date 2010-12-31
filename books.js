@@ -273,4 +273,44 @@ exports.list_books = function(start, end, callback) {
     });
 };
 
+// Some predicates helpful for badges
+// does the given pattern appear as one of the authors?
+Book.prototype.author_like = function(author_pattern) {
+    var authors = this.authors;
+    if (_.isNull(authors) || _.isUndefined(authors)) {
+        return false;
+    }
+    // force into array
+    if (!_.isArray(this.authors)) {
+        authors = [authors];
+    } 
+    // run match on each author
+    if (_.isArray(this.authors)) {
+        for(var i = 0; i < this.authors.length; i++) {
+            var a = this.authors[i];
+            if (_.isString(a)) {
+                var m = this.authors[i].match(author_substring);
+                if (!_.isNull(m)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// does the book title match the pattern?
+Book.prototype.title_like = function(title_pattern) {
+    var title = this.title
+    if (_.isNull(title) || _.isUndefined(title)) {
+        return false;
+    }
+    var m = title.match(title_pattern);
+    if (!_.isNull(m)) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 exports.Book = Book;
