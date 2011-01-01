@@ -14,7 +14,7 @@ Libraries can be installed with [npm](https://github.com/isaacs/npm#readme).  Ru
 * apac@latest
 * underscore@1.1.3
 * ejs@0.2.1
-* redis@0.4.2
+* redis@0.5.0
 * connect-auth@0.2.1
 * socket.io@0.6.1
 * vows@0.5.2
