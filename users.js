@@ -3,6 +3,7 @@ var sys = require('sys');
 var rclient = require('./redisclient');
 var pw = require('./passwords');
 var _ = require('underscore');
+var crypto = require('crypto');
 // We store users by a unique numeric ID.
 // We also maintain a mapping of email addresses -> ID's
 
@@ -70,6 +71,15 @@ function User (attrs) {
     return context;
 }
 
+User.prototype.gravatar_icon_url = function() {
+    var hash = crypto.createHash("md5");
+    var trimmed_email = this.email.replace(/^\s*/,"").replace(/\s*$/,"");
+    hash.update(trimmed_email);
+    var email_hash = hash.digest('hex');
+    var gravatar_icon_url = "http://www.gravatar.com/avatar/"+email_hash+"?d=identicon&r=g";
+    return gravatar_icon_url;
+}
+
 exports.get_by_id = function(id,callback) {
     get_by_key(key_from_id(id),callback);
 };
@@ -77,13 +87,11 @@ exports.get_by_id = function(id,callback) {
 var get_by_key = function(key, callback) {
     var client = rclient.getClient();
     // Lookup user by ID directly
-    console.log("about to do a lookup from get_by_key of ",key);
     client.get(key, function(err,result) {
         if (err) {
             console.log("Error getting user by key:", err);
         }
-        console.log("get_by_key result is",result);
-        var json = JSON.parse(result); // seems to die on occasion...maybe due to redis reconnect?
+        var json = JSON.parse(result);
         var user = new User(json);
         callback(err,user);
     });
