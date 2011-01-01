@@ -5,7 +5,7 @@
 </script>
 
 <div class="span-16">
-   <h1><%= pageuser.name %></h1>
+   <h1><img src="<%= pageuser.gravatar_icon_url() %>" /><%= pageuser.name %></h1>
 </div>
 
 <% if(userIsHome) { %>
