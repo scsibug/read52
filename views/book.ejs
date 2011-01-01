@@ -14,15 +14,15 @@
 <dt>EAN/ISBN-13</dt><dd><%= book.ean %></dd>
 <% } %>
 
-<% if (book.author) { %>
+<% if (book.authors) { %>
 <dt>Author</dt><dd><%= book.authors %></dd>
 <% } %>
 
-<% if (book.dewey_decimal) { %>
+<% if (book.dewey_decimal_number) { %>
 <dt>Dewey Decimal Number</dt><dd><%= book.dewey_decimal_number %></dd>
 <% } %>
 
-<% if (book.number_of_pages) { %>
+<% if (book.pages) { %>
 <dt>Pages</dt><dd><%= book.pages %></dd>
 <% } %>
 
