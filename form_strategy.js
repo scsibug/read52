@@ -23,7 +23,7 @@ module.exports= function(options) {
             } else {
                 user.checkPassword(password, function(err, result) {
                     if (result) {
-                        context.success( {id : user.id, name : user.name, email : user.email}, callback );
+                        context.success( {id : user.id, name : user.name, email : user.email, gravatar_url : user.gravatar_icon_url()}, callback );
                     } else {
                         context.fail(callback);
                     }
