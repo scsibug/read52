@@ -53,6 +53,12 @@ var process_logs = function(callback) {
                         console.log("Error getting reading:",err);
                         console.log("This event has been dropped!");
                         process_logs(callback);
+                    } if (_.isNull(r)) {
+                        console.log("Reading was null... was probably deleted after this update. Dropping this event.");
+                        process_logs(callback);
+                    } if (_.isNull(r.book)) {
+                        console.log("ERROR: Book is null for this reading... ignoring this event.");
+                        process_logs(callback);
                     } else {
                         console.log("Examining ",r.book.title,"for user",r.userid);
                         // send the reading to each badge,
