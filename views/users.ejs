@@ -1,16 +1,18 @@
 <div class="container">
-<div class="span-24 last">
-   <div class="span-12"><strong>ID</strong></div>
-   <div class="span-12 last"><strong>Name</strong></div>
+<div class="prepend-6 span-12 append-6 last">
+   <div class="span-6"><strong>Avatar</strong></div>
+   <div class="span-6 last"><strong>Name</strong></div>
 </div>
 <hr />
 
 <% for (ix in users) { 
    u = users[ix];
 %>
-<div class="span-24 last">
-<div class="span-12"><a href="/user/<%=u.id%>"><%=u.id%></a></div>
-<div class="span-12 last"><%=u.name%></div>
+<div class="prepend-6 span-12 append-6 last">
+<div class="span-6"><a href="/user/<%=u.id%>">
+  <img alt="User #<%=u.id%>"src="<%= u.gravatar_icon_url() %>" />
+</a></div>
+<div class="span-6 last"><%=u.name%></div>
 </div>
 <% } %>
 
