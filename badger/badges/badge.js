@@ -92,7 +92,7 @@ Badge.prototype.check_award = function(callback) {
 
 // boolean function that determines if user should get badge.
 // keeps pesky callbacks out of actual badge subclasses.
-Badge.prototype.should_award() {
+Badge.prototype.should_award = function() {
     return false;
 }
 
