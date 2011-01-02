@@ -35,6 +35,10 @@ socket.on('message', function(obj){
   </div>
   <div class="span-11 last">
   <h2 class="caps">Recently Read...</h2>
-  <div id="actions" class="span-6 last" />
+  <div id="actions" class="span-11 last">
+  <% for (var i = 0; i < actions.length ; i++) { %>
+     <span class='action'><%= actions[i] %></span>
+  <% } %>
+  </div>
   </div>
 </div>

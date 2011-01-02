@@ -56,18 +56,17 @@ body
 }
 */
 .action
-{ 
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+{
   display: block;
   margin-bottom: 0.5em;
   padding: 3px;
-  background: #ddf;
+  border-top: 2px solid #333;
+/*  background: #ddf;*/
 }
 
 .action:hover
 { 
-  background: #ccf;
+ /* background: #ccf;*/
 }
 
 p.elab

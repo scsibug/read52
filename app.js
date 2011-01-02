@@ -35,11 +35,21 @@ var authzUser = function authzUser(req,userid) {
 
 // Front page
 app.get('/', function(req, res){
-    res.render('index', {
-        locals: { title: "Welcome",
-                  nav: "home",
-                  user: req.getAuthDetails().user
-                }
+    actions.get_actions(10, function(err,actionlist) {
+        if (err) {
+            console.log("Err: ",err);
+            actionlist = [];
+        }
+        if (_.isNull(actionlist)) {
+            actionlist = [];
+        }
+        res.render('index', {
+            locals: { title: "Welcome",
+                      nav: "home",
+                      user: req.getAuthDetails().user,
+                      actions: actionlist.reverse()
+                    }
+        });
     });
 });
 
@@ -495,14 +505,6 @@ var socket = io.listen(app);
 actions.set_listener(function(msg) {
     socket.broadcast(msg);
 });
-
-socket.on('connection', function(client){
-    actions.get_actions(10, function(err,res) {
-        if (err) {
-            console.log("Err: ",err);
-        }
-        if (!_.isNull(res)) {
-            client.send(res.reverse());
-        }
-    });
-});
+// on connection, don't do anything...
+//socket.on('connection', function(client){
+//});
