@@ -21,7 +21,7 @@
   <script src="http://cdn.socket.io/stable/socket.io.js"></script>
   </head>
   <body>
-    <div class="topcontainer">
+    <div class="topmost-cont container">
       <div id="nav" class="prepend-8 span-16 last">
         <ul>
           <% if (nav=="books") { %>
@@ -63,7 +63,9 @@
         <% if (locals.pageuser) { %>
           <img id="titleavatar" src="<%= pageuser.gravatar_icon_url() %>" />
         <% } %>
-        <span id="titletext"><%= title %></span>
+        <span id="titletext">
+          <%=: title| truncate:50 %><% if (title.length>50) {%>&hellip;<%}%>
+        </span>
         </h1>
       </div>
     </div>
