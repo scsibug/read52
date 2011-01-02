@@ -21,49 +21,52 @@
   <script src="http://cdn.socket.io/stable/socket.io.js"></script>
   </head>
   <body>
-    <div class="container">
-
-      <div id="header" class="span-8">
-        <img src="/images/read52_52lines_top_bottom.png"/>
-      </div>
-
-      <div id="nav" class="span-16 last"> 
+    <div class="topcontainer">
+      <div id="nav" class="prepend-8 span-16 last">
         <ul>
-          <% if (nav=="home") { %>
-          <li>Home</li> 
-          <% } else { %>
-          <li><a href="/" title="Home">Home</a></li> 
-          <% } %>
-
           <% if (nav=="books") { %>
-          <li>Books</li> 
+          <li class="current">Books</li> 
           <% } else { %>
           <li><a href="/book" title="Books">Books</a></li> 
           <% } %>
 
           <% if (nav=="users") { %>
-          <li>Users</li> 
+          <li class="current">Users</li> 
           <% } else { %>
           <li><a href="/users" title="Users">Users</a></li> 
           <% } %>
 
           <% if (user == null) { %>
             <% if (nav=="login") { %>
-            <li>Login</li> 
+            <li class="current">Sign In</li> 
             <% } else { %>
             <li><a href="/login" title="Sign In">Sign In</a></li> 
             <% } %>
           <% } else { %>
             <% if (nav=="userhome") { %>
-              <li>Your Account</li> 
+              <li class="current">Your Account</li> 
             <% } else { %>
               <li><a href="/user/<%= user.id %>" title="Your Account">Your Account</a></li> 
             <% } %>
               <li><a href="/logout" title="Logout">Logout</a></li> 
           <% } %>
         </ul> 
+        
       </div>
-      <hr />
+      <div id="header" class="span-6">
+        <a href="/" alt="Home">
+          <img src="/images/read52_52lines_top_bottom_white.png"/>
+        </a>
+      </div>
+      <div id="maintitle" class="span-18 last">
+        <h1>
+        <% if (locals.pageuser) { %>
+          <img id="titleavatar" src="<%= pageuser.gravatar_icon_url() %>" />
+        <% } %>
+        <span id="titletext"><%= title %></span>
+        </h1>
+      </div>
+    </div>
     <%- body %>
   </body>
 </html>

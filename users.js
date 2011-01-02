@@ -78,7 +78,15 @@ User.prototype.gravatar_icon_url = function() {
     var email_hash = hash.digest('hex');
     var gravatar_icon_url = "http://www.gravatar.com/avatar/"+email_hash+"?d=identicon&r=g";
     return gravatar_icon_url;
-}
+};
+
+User.prototype.display_name = function() {
+    if (_.isUndefined(this.name) || _.isNull(this.name) || (this.name === "")) {
+        return "User #"+this.id;
+    } else {
+        return this.name;
+    }
+};
 
 exports.get_by_id = function(id,callback) {
     get_by_key(key_from_id(id),callback);

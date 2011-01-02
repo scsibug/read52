@@ -1,3 +1,4 @@
+<div class="container">
 <script>
 function message(obj){
   var el = $("<span class='action' />").hide().text(obj);
@@ -21,21 +22,19 @@ socket.on('message', function(obj){
 </div>
 
 <hr />
-<div id="main" class="span-17 colborder">
+  <div id="main" class="span-12 colborder">
+  
+  <h1 class="alt">Set Your Goal</h1>
+  <p class="elab">Reading a book every week is easier than it may sound.  Read a couple chapters in the morning or before bed during the week, then finish it off on the weekend.  Or, start more modest with a goal of a book every month.</p>
+  
+  <h1 class="alt">Track Your Progress</h1>
+  <p class="elab">Every time you finish a book, enter the ISBN (the number printed next to the barcode) on this site.  We will take care of finding the name, author, cover illustration, and other information.</p>
 
-<h1 class="alt">Set Your Goal</h1>
-<p class="elab">Reading a book every week is easier than it may sound.  Read a couple chapters in the morning or before bed during the week, then finish it off on the weekend.  Or, start more modest with a goal of a book every month.</p>
-
-<h1 class="alt">Track Your Progress</h1>
-<p class="elab">Every time you finish a book, enter the ISBN (the number printed next to the barcode) on this site.  We'll take care of finding the name, author, cover illustration, and other information.</p>
-
-<h1 class="alt">Share Your Success</h1>
-<p class="elab">Let your friends, family, coworkers, or classmates know about your goal, and show them your page with all the books you've read!</p>
-
-</div>
-<div class="span-6 last">
-  <h2 class="caps">Recent Actions...</h2>
+  <h1 class="alt">Share Your Success</h1>
+  <p class="elab">Let your friends, family, coworkers, or classmates know about your goal, and show them your page with all the books you have read!</p>
+  </div>
+  <div class="span-11 last">
+  <h2 class="caps">Recently Read...</h2>
   <div id="actions" class="span-6 last" />
+  </div>
 </div>
-
-

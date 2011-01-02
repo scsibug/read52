@@ -1,53 +1,55 @@
+<div class="container">
 <script>
   $(document).ready(function() {
   $(".date-pick").datepicker({formatDate: '@', altField: '#completion-date', altFormat: '@', showButtonPanel: true});
   });
 </script>
 
-<div class="span-16">
-   <h1><img src="<%= pageuser.gravatar_icon_url() %>" /><%= pageuser.name %></h1>
-</div>
-
 <% if(userIsHome) { %>
-<div id="subnav" class="prepend-2 span-6 last">
+<div id="subnav" class="prepend-18 span-6 last">
 <ul>
 <li><a href="#" onclick="$('#add-book').toggle('fast')">Add Book</a></li>
 </ul>
 </div>
 <% } %>
-
 </div>
 
 <% if (userIsHome) { %>
 <div id="add-book" class="hidden container">
+  <div class="prepend-4 span-16 append-6 last">
     <form id="add-book-form" action="/user/<%= user.id %>/read" method="post">
-      <div class="span-12">
-    <label for="searchterm">Book Identifier (ISBN, EAN, or ASIN)</label><br />
-        <input id="searchterm" type="text" class="title" name="searchterm" /> <br />
-        <label>Rating</label><br />
-                            <input class="star {split:2}" type="radio" name="rating" value="10"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="20"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="30"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="40"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="50"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="60"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="70"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="80"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="90"/>
-                            <input class="star {split:2}" type="radio" name="rating" value="100"/>
-                              <br />
-       <label for="comment">Comment</label><br />
-       <textarea id="comment" type="text" name="comment" rows="4"></textarea>
-      </div>
-      <div class="span-12 last">
-        <label for="completion-date">Date Finished</label><br />
-        <div class="date-pick"></div>
-        <input type="hidden" name="completion-date" id="completion-date"/>
-      </div>
-      <div class="prepend-10 span-2 append-10 last">
-        <button class="ui-state-default ui-corner-all" type="submit" value="Submit">Submit</button><br />
+      <div class="span-16 last dialog">
+        <div class="prepend-1 span-6 append-2">
+          <label for="searchterm">Book Identifier (ISBN, EAN, or ASIN)</label><br />
+          <input id="searchterm" type="text" class="title" name="searchterm" /> <br />
+          <label>Rating</label><br />
+          <input class="star {split:2}" type="radio" name="rating" value="10"/>
+          <input class="star {split:2}" type="radio" name="rating" value="20"/>
+          <input class="star {split:2}" type="radio" name="rating" value="30"/>
+          <input class="star {split:2}" type="radio" name="rating" value="40"/>
+          <input class="star {split:2}" type="radio" name="rating" value="50"/>
+          <input class="star {split:2}" type="radio" name="rating" value="60"/>
+          <input class="star {split:2}" type="radio" name="rating" value="70"/>
+          <input class="star {split:2}" type="radio" name="rating" value="80"/>
+          <input class="star {split:2}" type="radio" name="rating" value="90"/>
+          <input class="star {split:2}" type="radio" name="rating" value="100"/>
+          <br />
+          <label for="comment">Comment</label><br />
+          <textarea id="comment" type="text" name="comment" rows="3" cols="20"></textarea>
+        </div>
+        
+        <div class="span-7 last">
+          <label for="completion-date">Date Finished</label><br />
+          <div class="date-pick"></div>
+          <input type="hidden" name="completion-date" id="completion-date"/>
+        </div>
+        
+        <div class="prepend-7 span-2 append-7 last">
+          <button class="ui-state-default ui-corner-all" type="submit" value="Submit">Submit</button><br />
+        </div>
       </div>
     </form>
+  </div>
 </div>
 <% } %>
 

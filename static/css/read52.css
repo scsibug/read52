@@ -1,6 +1,17 @@
 body
 {
-  background: #ddd;
+  background: #fff url(/images/bg_repeat_2x140.png) repeat-x;
+}
+
+.topcontainer
+{ 
+  height: 130px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  padding-left:10px;
+  padding-right:10px;
+  margin-left:30px;
+  margin-top:10px;
 }
 
 .container
@@ -11,9 +22,38 @@ body
   padding-right:10px;
   margin-left:30px;
   margin-top:10px;
-  background: #fff;
-  border-bottom: 2px solid #bbb;
-  border-top: 1px solid #ccc;
+}
+
+#maintitle
+{
+  position:relative;
+}
+#titleavatar
+{
+  position:absolute;
+  bottom: 10px;
+}
+#titletext
+{ 
+  position:absolute;
+  left: 90px;
+  bottom: 10px;
+ }
+
+#maintitle h1
+{
+  color: #e5e5e5;
+  vertical-align: bottom;
+  height: 130px;
+  margin-bottom: 0px;
+  vertical-align: text-bottom;
+}
+
+#header
+{
+  position:relative;
+  z-index:2;
+  
 }
 
 /*.span-24, .span-12, .span-6
@@ -43,6 +83,12 @@ p.elab
 }
 
 /****  Navigation Menu *****/
+#nav
+{
+  color: #e5e5e5;
+  position: absolute;
+  z-index:1;
+}
 #nav ul
 {
   float: right;
@@ -54,20 +100,24 @@ p.elab
   display: inline;
   float: left;
   margin: 0px 0px 0x 0x;
-  background: #555;
-  color: white;
-  padding: 10px;
+  padding: 0px 10px 0px 0px;
   font-weight: bold;
   text-decoration: none;
 }
 
 #nav ul li a
 {
-  background: #555;
-  color: white;
+  color: #e5e5e5;
 }
 
 /***** Buttons Submenu******/
+#subnav
+{
+  // TODO: position absolute without blocking links further left
+//  position: absolute;
+//  top:140px;
+//  z-index: 1;
+}
 #subnav ul
 {
   float: right;
@@ -78,8 +128,6 @@ p.elab
   display: inline;
   float: left;
   margin: 0px 0px 0x 0x;
-  background: #555;
-  color: white;
   padding: 10px;
   font-weight: bold;
   text-decoration: none;
@@ -87,10 +135,17 @@ p.elab
 
 #subnav ul li a
 {
-  background: #555;
-  color: white;
   cursor: pointer;
 }
+
+/******** Pop-up dialogs *******************/
+
+.dialog
+{ 
+  border: 4px solid #888;
+  background: #eee;
+}
+
 /***************************/
 
 .hidden
@@ -109,3 +164,9 @@ p.elab
 }
 
 /*******************************/
+
+textarea
+{
+  width: 250px;
+  height: 150px;
+}

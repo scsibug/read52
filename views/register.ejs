@@ -1,10 +1,13 @@
-<div class="span-24 last">
-   <h1>Register a New Account</h1>
-   <h3>(or <a href="/login">login</a>)</h3>
+<div class="container">
+
+<div id="subnav" class="prepend-18 span-6 last">
+<ul>
+<li><a href="/login">Already have an account?</a></li>
+</ul>
 </div>
 
 <% if (flash.error) { %>
-<div class="span-24 last error">
+<div class="span-18 last error">
   <%= flash.error %>
 </div>
 <% } %>
@@ -21,4 +24,5 @@
    <input type="password" class="text" name="verify_password" /><br />
    <input type="submit" value="Submit" /><br />
    </form>
+</div>
 </div>

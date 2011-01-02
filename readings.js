@@ -91,7 +91,7 @@ exports.create = function(attrs, callback) {
                 // and copy book data into reading
                 books.get_by_id(attrs.book_id,function(err,book) {
                     if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
-                        actions.publish_action(attrs.userid,"read " + book.title)
+                        actions.publish_action(attrs.userid,": " + book.title)
                     }
                     reading.book = book;
                     callback(err,reading);

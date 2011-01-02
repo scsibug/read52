@@ -36,7 +36,7 @@ var authzUser = function authzUser(req,userid) {
 // Front page
 app.get('/', function(req, res){
     res.render('index', {
-        locals: { title: "Read52",
+        locals: { title: "Welcome",
                   nav: "home",
                   user: req.getAuthDetails().user
                 }
@@ -46,7 +46,7 @@ app.get('/', function(req, res){
 // Display login screen
 app.get('/login', function(req, res) {
     res.render('login', {
-        locals: { title: "Login",
+        locals: { title: "Sign In",
                   nav: "login",
                   user: req.getAuthDetails().user
                 }
@@ -172,7 +172,7 @@ app.get('/user/:id', function(req, res, next) {
                             nav = "userhome";
                         }
                         res.render('user', {
-                            locals: {title: "User",
+                            locals: {title: pageuser.display_name(),
                                      nav: nav,
                                      bookcount: bookcount,
                                      user: req.getAuthDetails().user,
@@ -399,7 +399,7 @@ app.get('/book', function(req, res){
 app.get('/book/:id', function(req, res) {
     books.get_by_id(req.params.id, function(err,b) {
         res.render('book', {
-            locals: { title: ("Info for "+b.title),
+            locals: { title: (b.title),
                       book: b,
                       nav: "books",
                       user: req.getAuthDetails().user
