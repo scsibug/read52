@@ -4,7 +4,7 @@ function message(obj){
   var el = $("<span class='action' />").hide().html(obj);
   $('#actions').prepend(el);
   el.fadeIn();
-  var actions = $('#actions p').length;
+  var actions = $('#actions span').length;
   if (actions > 10) {
     $('#actions span:last').remove();
   }
