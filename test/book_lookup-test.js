@@ -7,7 +7,7 @@ var book_lookup = require('../book_lookup');
 vows.describe('Amazon Book Lookup').addBatch({
     'Lookup Book': {
         topic: function () {
-            book_lookup.isbn_lookup("9780060733353",this.callback);
+            book_lookup.lookup("9780060733353",this.callback);
         },
         'has ASIN': function(err, book) {
             assert.equal(book.ASIN, "0060733357");
