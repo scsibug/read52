@@ -47,7 +47,7 @@ app.get('/', function(req, res){
             locals: { title: "Welcome",
                       nav: "home",
                       user: req.getAuthDetails().user,
-                      actions: actionlist.reverse()
+                      actions: actionlist
                     }
         });
     });
