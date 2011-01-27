@@ -329,7 +329,7 @@ app.get('/user/:id/read/:bookid', function (req, res, next) {
 });
 
 // Add a book that a user has read
-app.post('/user/:id/read', function (req, res) {
+app.post('/user/:id/read', function (req, res, next) {
     var completion_date = parseInt(req.body["completion-date"]);
     if (_.isNull(completion_date) || _.isNull(completion_date) || !_.isNumber(completion_date)) {
         completion_date = +new Date();
@@ -346,6 +346,9 @@ app.post('/user/:id/read', function (req, res) {
         books.create_from_identifier(term,function(err,book) {
             console.log(book);
             console.log(err);
+            if(err){
+                return next(new Error(err));
+            }
             var book_id = book.id;
             readings.create(
                 {userid: req.params.id,

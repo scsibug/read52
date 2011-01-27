@@ -106,6 +106,11 @@ exports.create_from_identifier = function(term,callback) {
                 // if book not found, send URI to book lookup service
                 book_lookup.lookup(search.type, search.value, function(err,lookup_book) {
                     console.log("book lookup service returned");
+                    if(err){
+                         console.log('Error in book lookup');
+                         callback("Book lookup error",null);
+                         return;
+                    }
                     var b = new Book(lookup_book);
                     make_book_id(function(err,book_id) {
                         if (err) {
