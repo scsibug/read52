@@ -48,6 +48,7 @@ RedisStore.prototype.get = function(hash, fn){
         ? JSON.parse(data.toString())
         : data);
     } catch (err) {
+      console.log("ERROR with RedisStore.get",err);
       fn(err);
     } 
   });
@@ -69,6 +70,7 @@ RedisStore.prototype.set = function(hash, sess, fn){
       fn && fn.apply(this, arguments);
     });
   } catch (err) {
+    console.log("ERROR with RedisStore.set",err);
     fn && fn(err);
   } 
 };

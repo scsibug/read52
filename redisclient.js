@@ -12,6 +12,7 @@ var session_db = 1;
 
 exports.initClient = function(select_db) {
     client = redis.createClient();
+    //redis.debug_mode = true;
     if (select_db) {db = select_db;}
     client.select(db,function(){});
     return client;

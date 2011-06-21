@@ -47,7 +47,7 @@ app.get('/', function(req, res){
             locals: { title: "Welcome",
                       nav: "home",
                       user: req.getAuthDetails().user,
-                      actions: actionlist.reverse()
+                      actions: actionlist
                     }
         });
     });
@@ -202,7 +202,21 @@ app.get('/user/:id', function(req, res, next) {
 // Get all public data a user has entered
 app.get('/user/:id/export', function (req, res) {
     readings.readings_for_user(req.params.id,0,-1,function(err,readings) {
-        res.send(JSON.stringify(readings));
+        var exportdata = _.map(readings,function(r) {
+            exportr = {};
+            if (!_.isUndefined(r.book.ean)) {
+                exportr.ean = r.book.ean;
+            }
+            if (!_.isUndefined(r.book.asin)) {
+                exportr.asin = r.book.asin;
+            }
+            exportr.comment = r.comment;
+            exportr.completion_date = r.completion_date;
+            exportr.rating = r.rating;
+
+            return exportr;
+        });
+        res.send(JSON.stringify(exportdata));
     });
 });
 
@@ -234,12 +248,22 @@ app.post('/user/:id/import', function (req, res) {
                 // our file is at:
                 var location = files.datafile.path
                 fs.readFile(location, function (err,data) {
+                    if (err) {
+                        console.log("Error reading form file",err);
+                        return;
+                    }
                     fs.unlink(location,function(err) {
                         if (err) {
-                            console.log(err);
+                            console.log("Error unlinking saved form data",err);
                         }
                     });
-                    var importjson = JSON.parse(data);
+                    try {
+                        var importjson = JSON.parse(data);
+                    } catch (e) {
+                        console.log("Input was not valid JSON");
+                        res.redirect("/");
+                        return;
+                    }
                     // We are expecting the body to be JSON-encoded readings.
                     // We ignore some fields(userid), and use the rest to recreate readings.
 
@@ -305,7 +329,7 @@ app.get('/user/:id/read/:bookid', function (req, res, next) {
 });
 
 // Add a book that a user has read
-app.post('/user/:id/read', function (req, res) {
+app.post('/user/:id/read', function (req, res, next) {
     var completion_date = parseInt(req.body["completion-date"]);
     if (_.isNull(completion_date) || _.isNull(completion_date) || !_.isNumber(completion_date)) {
         completion_date = +new Date();
@@ -322,6 +346,9 @@ app.post('/user/:id/read', function (req, res) {
         books.create_from_identifier(term,function(err,book) {
             console.log(book);
             console.log(err);
+            if(err){
+                return next(new Error(err));
+            }
             var book_id = book.id;
             readings.create(
                 {userid: req.params.id,

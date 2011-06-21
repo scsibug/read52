@@ -1,7 +1,7 @@
 var sys = require('sys'),
     vows = require('vows'),
     assert = require('assert');
-var books = require('../books_universal');
+var books = require('../books');
 var rclient = require('../redisclient');
 var client = rclient.initClient(15);
 var _ = require('underscore');

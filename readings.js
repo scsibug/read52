@@ -6,6 +6,7 @@ var sys = require('sys');
 var rclient = require('./redisclient');
 var actions = require('./actions');
 var books = require('./books');
+var users = require('./users');
 var badge_log = require('./badger/badge_process_log');
 
 // Keys that are specific to a reading object, that should be serialized/deserialized
@@ -61,6 +62,10 @@ exports.clean_rating = function (dirty_rating) {
     return clean_rating;
 };
 
+exports.url_for_id = function(userid,bookid) {
+    return (users.url_for_id(userid) + "/read/" + bookid);
+}
+
 // Create a reading object from a set of attributes.
 function Reading (attrs) {
     var context = this;
@@ -91,7 +96,8 @@ exports.create = function(attrs, callback) {
                 // and copy book data into reading
                 books.get_by_id(attrs.book_id,function(err,book) {
                     if (!_.isNull(book.title) && !_.isUndefined(book.title)) {
-                        actions.publish_action(attrs.userid,": " + book.title)
+                        actions.publish_action(attrs.userid,"read",book);
+//                        actions.publish_action(attrs.userid,": " + book.title)
                     }
                     reading.book = book;
                     callback(err,reading);

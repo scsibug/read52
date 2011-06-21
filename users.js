@@ -71,12 +71,13 @@ function User (attrs) {
     return context;
 }
 
-User.prototype.gravatar_icon_url = function() {
+User.prototype.gravatar_icon_url = function(options) {
+    var options = options || {size: 80};
     var hash = crypto.createHash("md5");
     var trimmed_email = this.email.replace(/^\s*/,"").replace(/\s*$/,"");
     hash.update(trimmed_email);
     var email_hash = hash.digest('hex');
-    var gravatar_icon_url = "http://www.gravatar.com/avatar/"+email_hash+"?d=identicon&r=g";
+    var gravatar_icon_url = "http://www.gravatar.com/avatar/"+email_hash+"?d=identicon&r=g&s="+options.size;
     return gravatar_icon_url;
 };
 
@@ -104,6 +105,10 @@ var get_by_key = function(key, callback) {
         callback(err,user);
     });
 };
+
+exports.url_for_id = function(id) {
+    return ("/user/"+id);
+}
 
 // Creating new user
 //  users.create({name="foo", email="foo@bar.com", name="Foo Bar", password="fb"},callback)

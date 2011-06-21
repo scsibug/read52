@@ -1,10 +1,10 @@
 <div class="container">
 <script>
 function message(obj){
-  var el = $("<span class='action' />").hide().text(obj);
+  var el = $("<span class='action' />").hide().html(obj);
   $('#actions').prepend(el);
   el.fadeIn();
-  var actions = $('#actions p').length;
+  var actions = $('#actions span').length;
   if (actions > 10) {
     $('#actions span:last').remove();
   }
@@ -37,7 +37,7 @@ socket.on('message', function(obj){
   <h2 class="caps">Recently Read...</h2>
   <div id="actions" class="span-11 last">
   <% for (var i = 0; i < actions.length ; i++) { %>
-     <span class='action'><%= actions[i] %></span>
+     <span class='action'><%- actions[i] %></span>
   <% } %>
   </div>
   </div>
