@@ -162,7 +162,7 @@ app.get('/user/:id', function(req, res, next) {
                 console.log(err);
                 res.redirect('/');
             }
-            readings.readings_for_user(req.params.id,0,52,function(err,myreadings) {
+            readings.readings_for_user(req.params.id,0,-1,function(err,myreadings) {
                 if (err) {
                     console.log(err);
                     res.redirect('/');
