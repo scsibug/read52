@@ -220,6 +220,34 @@ app.get('/user/:id/export', function (req, res) {
     });
 });
 
+// Get all public data a user has entered
+app.get('/user/:id/export_detail', function (req, res) {
+    readings.readings_for_user(req.params.id,0,-1,function(err,readings) {
+        var exportdata = _.map(readings,function(r) {
+            exportr = {};
+            exportr.title = r.book.title;
+            exportr.url = r.book.url;
+
+            if (!_.isUndefined(r.book.dewey_decimal_number)) {
+                exportr.dewey_decimal_number = r.book.dewey_decimal_number
+            }
+            if (!_.isUndefined(r.book.ean)) {
+                exportr.ean = r.book.ean;
+            }
+            if (!_.isUndefined(r.book.asin)) {
+                exportr.asin = r.book.asin;
+            }
+            exportr.comment = r.comment;
+            exportr.completion_date = r.completion_date;
+            exportr.rating = r.rating;
+
+
+            return exportr;
+        });
+        res.send(JSON.stringify(exportdata));
+    });
+});
+
 app.get('/user/:id/import', function (req, res) {
     res.render('import', {
         locals: { title: "Import Data",
