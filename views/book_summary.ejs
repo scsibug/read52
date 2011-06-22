@@ -14,7 +14,7 @@
     <% for (ix in readings) {
        reading = readings[ix];
      %>
-       <li><%= reading.book.title %></li>
+       <li><%= new Date(reading.completion_date).getDate() %>-<%= new Date(reading.completion_date).getMonth()+1 %>-<%= new Date(reading.completion_date).getFullYear() %>: <a href="<%= reading.book.url %>"><%= reading.book.title %></a></li>
     <% } %>
     </ul>
   </div>
