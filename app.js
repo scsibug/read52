@@ -199,24 +199,30 @@ app.get('/user/:id', function(req, res, next) {
     });
 });
 
-// Get all public data a user has entered
-app.get('/user/:id/export', function (req, res) {
-    readings.readings_for_user(req.params.id,0,-1,function(err,readings) {
-        var exportdata = _.map(readings,function(r) {
-            exportr = {};
-            if (!_.isUndefined(r.book.ean)) {
-                exportr.ean = r.book.ean;
-            }
-            if (!_.isUndefined(r.book.asin)) {
-                exportr.asin = r.book.asin;
-            }
-            exportr.comment = r.comment;
-            exportr.completion_date = r.completion_date;
-            exportr.rating = r.rating;
 
-            return exportr;
+
+// Get all public data a user has entered
+app.get('/user/:id/book_summary', function (req, res) {
+    readings.readings_for_user(req.params.id,0,-1,function(err,readings) {
+        var nav = "user";
+        if (authzUser(req,req.params.id)) {
+            nav = "userhome";
+        }
+        users.get_by_id(req.params.id, function(err, pageuser) {
+            if (err) {
+                console.log(err);
+                res.redirect('/');
+            }
+            res.render('book_summary', {
+                locals: {title: "Book Summary",
+                         nav: nav,
+                         user: req.getAuthDetails().user,
+                         pageuser: pageuser,
+                         userIsHome: authzUser(req,req.params.id),
+                         readings: readings,
+                        }
+            });
         });
-        res.send(JSON.stringify(exportdata));
     });
 });
 

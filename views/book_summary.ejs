@@ -1,0 +1,21 @@
+<div class="container">
+<script>
+  $(document).ready(function() {
+  });
+</script>
+
+</div>
+
+
+<div class="container">
+
+  <div class="span-24 last">
+   <ul>
+    <% for (ix in readings) {
+       reading = readings[ix];
+     %>
+       <li><%= reading.book.title %></li>
+    <% } %>
+    </ul>
+  </div>
+</div>
